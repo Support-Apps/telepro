@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>טלפרומפטר | קורס איך לבנות קורס דיגיטלי מצליח</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;900&family=Frank+Ruhl+Libre:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --pink:#FBCFE0;--pk-l:#FDF2F8;--pk-s:#FCE7F3;--pk-d:#EC4899;
+  --mint:#A8E6CF;--mt-l:#ECFDF5;--mt-s:#D1FAE5;--mt-d:#059669;
+  --gold:#D4A843;--gd-l:#FEF9E7;--gd-s:#FDE68A;--gd-d:#B8860B;
+  --dark:#3D2B1F;--txt:#4A3728;--mut:#8B7B6B;--bg:#FFFBF7;--card:#FFFFFF;
+  --hl:#FEF3C7;--hl-b:#F59E0B;--read-bg:#D1FAE5;--read-b:#059669;
+}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);}
+.app{display:flex;height:100vh;}
+
+/* Sidebar */
+.sb{width:310px;min-width:310px;height:100vh;background:var(--card);border-left:3px solid var(--pink);display:flex;flex-direction:column;overflow:hidden;transition:all 0.3s;}
+.sb.collapsed{width:0;min-width:0;border:none;overflow:hidden;}
+.sb-head{padding:20px 16px;border-bottom:2px solid var(--pk-s);background:var(--pk-l);text-align:center;flex-shrink:0;}
+.sb-head h2{font-family:'Frank Ruhl Libre',serif;color:var(--gd-d);font-size:1.2rem;}
+.sb-head .sub{color:var(--mut);font-size:0.78rem;margin-top:4px;}
+.sb-scroll{flex:1;overflow-y:auto;padding:10px 12px;}
+.mg{margin-bottom:6px;}
+.mb{width:100%;text-align:right;background:var(--pk-l);border:1.5px solid var(--pink);border-radius:10px;padding:11px 14px;cursor:pointer;font-weight:700;color:var(--dark);font-size:0.88rem;font-family:'Heebo',sans-serif;display:flex;align-items:center;gap:8px;transition:all 0.2s;}
+.mb:hover{background:var(--pk-s);}
+.mb.act{background:var(--gd-l);border-color:var(--gold);color:var(--gd-d);}
+.mb .arr{margin-right:auto;font-size:0.65rem;color:var(--mut);transition:transform 0.3s;}
+.mb.act .arr{transform:rotate(90deg);}
+.ll{display:none;padding:4px 0 4px 8px;}
+.ll.show{display:block;}
+.lb{display:block;width:100%;text-align:right;background:none;border:none;color:var(--mut);padding:9px 12px;font-size:0.83rem;cursor:pointer;border-radius:8px;font-family:'Heebo',sans-serif;border-right:3px solid transparent;transition:all 0.2s;}
+.lb:hover{color:var(--txt);background:var(--mt-l);border-right-color:var(--mint);}
+.lb.act{color:var(--gd-d);background:var(--gd-l);border-right-color:var(--gold);font-weight:600;}
+.sb-foot{padding:10px;border-top:2px solid var(--pk-s);background:var(--pk-l);text-align:center;flex-shrink:0;}
+.sb-foot .brand{color:var(--mut);font-size:0.7rem;}
+
+/* Main */
+.mn{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.top{background:var(--card);border-bottom:2px solid var(--pk-s);padding:10px 16px;display:flex;align-items:center;flex-shrink:0;gap:6px;}
+.tog{background:var(--pk-l);border:1.5px solid var(--pink);color:var(--gd-d);width:40px;height:40px;border-radius:10px;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.tog:hover{background:var(--pk-s);}
+.ttl{font-family:'Heebo',sans-serif;color:var(--gd-d);font-size:0.88rem;font-weight:400;white-space:nowrap;flex-shrink:0;}
+.ctrls{display:flex;align-items:center;flex:1;gap:0;justify-content:stretch;}
+.ctrls>*{flex:1;text-align:center;}
+.cb{background:var(--pk-l);border:1.5px solid var(--pink);color:var(--txt);padding:9px 0;border-radius:22px;font-family:'Heebo',sans-serif;font-size:0.85rem;cursor:pointer;font-weight:600;white-space:nowrap;transition:all 0.2s;margin:0 3px;}
+.cb:hover{background:var(--pk-s);}
+.cb.on{background:var(--gold);border-color:var(--gd-d);color:#fff;}
+.cb.rec{background:#fee2e2;border-color:#f87171;color:#dc2626;animation:recPulse 1.2s ease-in-out infinite;}
+@keyframes recPulse{0%,100%{opacity:1;}50%{opacity:0.7;}}
+.cg{display:flex;align-items:center;justify-content:center;gap:5px;color:var(--txt);font-size:0.85rem;background:var(--pk-l);padding:9px 0;border-radius:22px;border:1.5px solid var(--pink);white-space:nowrap;font-weight:500;margin:0 3px;}
+.cg span{font-size:0.85rem;}
+.cg input[type=range]{width:70px;accent-color:var(--gold);}
+.sz{background:var(--card);border:1.5px solid var(--pink);color:var(--txt);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:0.85rem;display:flex;align-items:center;justify-content:center;font-weight:700;}
+.sz:hover{border-color:var(--gold);background:var(--gd-l);}
+
+/* Camera */
+.cam-wrap{position:relative;width:100%;max-height:0;overflow:hidden;transition:max-height 0.4s ease;background:#000;}
+.cam-wrap.open{max-height:300px;}
+.cam-vid{width:100%;height:200px;object-fit:cover;transform:scaleX(-1);}
+.cam-ctrls{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:10;}
+.cam-btn{background:rgba(255,255,255,0.9);border:none;padding:6px 16px;border-radius:16px;font-family:'Heebo',sans-serif;font-size:0.8rem;cursor:pointer;font-weight:600;color:var(--txt);backdrop-filter:blur(4px);}
+.cam-btn:hover{background:#fff;}
+.cam-btn.recording{background:#fee2e2;color:#dc2626;}
+.cam-timer{position:absolute;top:8px;right:12px;background:rgba(220,38,38,0.9);color:#fff;padding:3px 10px;border-radius:12px;font-size:0.78rem;font-weight:600;display:none;}
+.cam-timer.on{display:block;}
+
+/* Tabs */
+.tabs{display:flex;background:var(--card);border-bottom:2px solid var(--pk-s);flex-shrink:0;padding:0 20px;}
+.tab{padding:10px 22px;border-bottom:3px solid transparent;color:var(--mut);cursor:pointer;font-size:0.85rem;font-weight:500;transition:all 0.2s;}
+.tab:hover{color:var(--txt);}
+.tab.on{color:var(--gd-d);border-bottom-color:var(--gold);font-weight:700;}
+
+/* Panels */
+.panels{flex:1;overflow:hidden;position:relative;}
+.pnl{display:none;height:100%;overflow-y:auto;padding:28px 36px 100px;}
+.pnl.on{display:block;}
+
+/* Teleprompter text */
+.tp{font-family:'Frank Ruhl Libre','Heebo',serif;line-height:2.4;}
+.seg{margin-bottom:20px;padding:18px 22px;border-radius:14px;border:1.5px solid transparent;background:var(--card);box-shadow:0 1px 6px rgba(0,0,0,0.02);transition:all 0.3s;}
+.seg.hl{border-color:var(--gold);background:var(--gd-l);}
+.ts-line{color:var(--gd-d);font-weight:700;font-size:1em;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--gd-s);}
+.bc{color:var(--pk-d);font-size:0.8em;margin:6px 0;padding:5px 12px;background:var(--pk-l);border-radius:6px;border-right:3px solid var(--pink);display:inline-block;}
+.ic-cue{color:var(--mt-d);font-size:0.8em;margin:4px 0;padding:5px 12px;background:var(--mt-l);border-radius:6px;border-right:3px solid var(--mint);display:inline-block;}
+
+/* Sentence highlighting */
+.sent{
+  display:block;
+  padding:5px 4px;
+  margin-bottom:2px;
+  border-radius:5px;
+  cursor:pointer;
+  border-right:3px solid transparent;
+  transition:background 0.3s ease, border-color 0.3s ease, opacity 0.3s ease;
+}
+.sent.current{
+  background:var(--hl);
+  border-right-color:var(--hl-b);
+}
+.sent.read{
+  background:var(--read-bg);
+  border-right-color:var(--read-b);
+  opacity:0.65;
+}
+.sent:hover{background:var(--pk-l);}
+/* Manual click override */
+.sent.manual-read{
+  background:var(--read-bg);
+  border-right-color:var(--read-b);
+  opacity:0.65;
+}
+
+.tip-bx{background:var(--gd-l);border-right:4px solid var(--gold);padding:10px 16px;border-radius:6px;margin-top:10px;color:var(--gd-d);font-size:0.88em;font-weight:500;}
+
+/* AI prompts */
+.ai-cd{background:var(--card);border:1.5px solid var(--mt-s);border-radius:12px;padding:18px 22px;margin-bottom:12px;}
+.ai-cd:hover{border-color:var(--mint);}
+.ai-cd .lbl{color:var(--gd-d);font-weight:700;font-size:0.9rem;margin-bottom:8px;}
+.pr{font-family:'Courier New',monospace;color:var(--mut);font-size:0.83rem;line-height:1.6;direction:ltr;text-align:left;background:var(--mt-l);padding:12px 16px;border-radius:8px;cursor:pointer;border:1.5px solid transparent;transition:all 0.2s;}
+.pr:hover{border-color:var(--mint);}
+.pr.copied{border-color:var(--gold);background:var(--gd-l);}
+.ch{font-size:0.7rem;margin-top:4px;color:var(--mt-d);}
+.ic-cd{background:var(--card);border:1.5px solid var(--pk-s);border-radius:12px;padding:14px 18px;margin-bottom:10px;}
+.ic-cd .il{color:var(--pk-d);font-weight:700;font-size:0.86rem;margin-bottom:6px;}
+.ic-pr{font-family:'Courier New',monospace;color:var(--mut);font-size:0.8rem;direction:ltr;text-align:left;background:var(--pk-l);padding:10px 14px;border-radius:8px;cursor:pointer;line-height:1.5;border:1.5px solid transparent;}
+.ic-pr:hover{border-color:var(--pink);}
+
+/* Welcome */
+.welc{text-align:center;padding:80px 20px;}
+.welc .emo{font-size:3rem;margin-bottom:16px;}
+.welc .wt{font-family:'Frank Ruhl Libre',serif;font-size:1.4rem;color:var(--gd-d);margin-bottom:8px;}
+.welc .wd{color:var(--mut);font-size:0.95rem;line-height:2;}
+
+/* Progress */
+.prog{position:absolute;bottom:0;left:0;right:0;height:4px;background:var(--pk-l);z-index:5;}
+.prog-f{height:100%;background:var(--gold);width:0;transition:width 0.3s;}
+.sctop{position:absolute;bottom:24px;left:24px;z-index:20;background:var(--gold);color:#fff;border:none;width:40px;height:40px;border-radius:50%;font-size:1.1rem;cursor:pointer;opacity:0;transition:all 0.3s;}
+.sctop.show{opacity:1;}
+
+@media(max-width:768px){
+  .sb,.sb.collapsed{position:fixed;left:0;right:0;top:0;bottom:0;width:100%!important;min-width:100%!important;z-index:100;display:none;border:none;transform:none;}
+  .sb.mob,.sb.mob.collapsed{display:flex!important;width:100%!important;min-width:100%!important;transform:none!important;}
+  .pnl{padding:16px 14px 80px;}
+  .top{padding:8px 10px;gap:4px;}
+  .ttl{font-size:0.78rem;}
+  .ctrls{flex:1;overflow-x:auto;-webkit-overflow-scrolling:touch;gap:0;}
+  .ctrls>*{flex:none;}
+  .cb{padding:7px 12px;font-size:0.78rem;margin:0 2px;}
+  .cg{padding:5px 8px;font-size:0.78rem;margin:0 2px;}
+  .cg span{font-size:0.78rem;}
+  .cg input[type=range]{width:50px;}
+  .sz{width:24px;height:24px;font-size:0.78rem;}
+  .cam-vid{height:150px;}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sb collapsed" id="sb">
+    <div class="sb-head"><h2>📚 תפריט הקורס</h2><div class="sub">בחר שיעור כדי להתחיל</div></div>
+    <div class="sb-scroll" id="sbC"></div>
+    <div class="sb-foot"><div class="brand">🎬 טלפרומפטר | קורס דיגיטלי מצליח</div></div>
+  </aside>
+
+  <div class="mn">
+    <div class="top">
+      <button class="tog" onclick="togSB()">☰</button>
+      <div class="ttl" id="ttl">בחר שיעור כדי להתחיל</div>
+      <div class="ctrls">
+        <button class="cb" onclick="togPlay()" id="pb">▶ הפעלה</button>
+        <button class="cb" onclick="togFreePlay()" id="fpb">📖 קצב אישי</button>
+        <button class="cb" onclick="handleReset()">🔄 איפוס</button>
+        <button class="cb" onclick="togCam()" id="camBtn">📹 מצלמה</button>
+        <div class="cg"><span>מהירות</span><input type="range" min="0.1" max="10" value="1" step="0.1" id="spd" oninput="updSpd()"><span id="spdV">1</span></div>
+        <div class="cg"><span>גודל</span><button class="sz" onclick="chFnt(-2)">−</button><span id="fntV">26</span><button class="sz" onclick="chFnt(2)">+</button></div>
+      </div>
+    </div>
+
+    <div class="cam-wrap" id="camWrap">
+      <video class="cam-vid" id="camVid" autoplay muted playsinline></video>
+      <div class="cam-timer" id="camTimer">● 00:00</div>
+      <div class="cam-ctrls">
+        <button class="cam-btn" id="recBtn" onclick="togRec()">⏺ הקלטה</button>
+        <button class="cam-btn" onclick="stopCam()">✕ סגור</button>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab on" onclick="swTab(0)">📜 תסריט</div>
+      <div class="tab" onclick="swTab(1)">🎨 תמונות AI</div>
+      <div class="tab" onclick="swTab(2)">✨ אייקונים</div>
+    </div>
+
+    <div class="panels">
+      <div class="pnl on" id="pnl0">
+        <div class="tp" id="tp" style="font-size:26px">
+          <div class="welc"><div class="emo">🎬</div><div class="wt">בחר שיעור מהתפריט</div><div class="wd">כל משפט יתמרקר אוטומטית תוך כדי הגלילה<br>🟡 צהוב = בקריאה | 🟢 ירוק = נקרא</div></div>
+        </div>
+      </div>
+      <div class="pnl" id="pnl1"><div class="welc"><div class="emo">🎨</div><div class="wt">פרומפטים לתמונות AI</div><div class="wd">בחר שיעור מהתפריט</div></div></div>
+      <div class="pnl" id="pnl2"><div class="welc"><div class="emo">✨</div><div class="wt">אייקונים קופצים</div><div class="wd">בחר שיעור מהתפריט</div></div></div>
+      <div class="prog"><div class="prog-f" id="progF"></div></div>
+      <button class="sctop" id="scTop" onclick="scToTop()">↑</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+</script>
+<script id="dataScript">
+const D=[
+{m:"מבוא לקורס",icon:"👋",lessons:[
+{t:"מבוא: ברוכים הבאים לקורס",d:"3 דקות",segs:[
+{time:"0:00-0:45 – פתיחה",body:"חיוך חם, אנרגיה גבוהה",script:"היי! ברוכים הבאים לקורס איך לבנות קורס דיגיטלי מצליח. אם אתם כאן, סימן שיש לכם ידע, ניסיון או כישרון שאתם רוצים להפוך לקורס שימכר שוב ושוב. בקורס הזה אני הולכת ללמד אתכם בדיוק איך לעשות את זה, צעד אחר צעד.",ai:"A warm welcoming illustration of a friendly female course creator waving at the camera from a beautiful home studio setup. Soft pink and mint green decor, golden accents, bookshelf in background, ring light visible. Welcoming and professional atmosphere, text overlay saying WELCOME in elegant gold. 16:9 aspect ratio.",icons:[{d:"שלום",p:"Waving hand emoji, friendly greeting, gold sparkle, transparent background."},{d:"כוכב",p:"Golden star with welcome banner, celebration, transparent background."}]},
+{time:"0:45-1:45 – מה תלמדו בקורס",body:"דברו בביטחון",script:"הקורס מחולק לאחד עשר מודולים. נתחיל במציאת הנושא המנצח שלכם. נעבור לתכנון מבנה הקורס ויצירת התוכן. נלמד איך לבחור פלטפורמה, איך לשווק ולמכור, איך לבנות מערכת אוטומטית שמייצרת הכנסה פסיבית. נדבר על ציוד, תוכנות, שפת גוף, ביטחון מול מצלמה, ואיך לתמחר נכון. ובסוף נלמד מתי הקורס באמת מוכן להשקה.",ai:"A beautiful course roadmap infographic showing 11 numbered milestone icons arranged in a winding golden path. Each milestone has a small representative icon: target, blueprint, video camera, laptop, megaphone, gears, microphone, person speaking, camera, diamond, checkmark. Pastel pink and mint green color scheme with gold path. Professional course overview visualization, 16:9.",icons:[{d:"מפה",p:"Roadmap with golden milestones, course journey, pastel colors, transparent background."}]},
+{time:"1:45-3:00 – למי מתאים הקורס",body:"דברו באמפתיה וחיוך",script:"הקורס מתאים לכל מי שיש לו ידע בתחום כלשהו ורוצה להפוך אותו למוצר דיגיטלי. לא צריך ניסיון קודם ביצירת קורסים. לא צריך ציוד יקר. לא צריך להיות מומחה עולמי. מספיק שאתם יודעים משהו שאנשים אחרים רוצים ללמוד. הדבר היחיד שאתם צריכים זה להתחיל. אז בואו נתחיל!",ai:"A diverse group of illustrated people each holding a different skill icon: a chef with a cooking pot, a photographer with a camera, a yoga instructor in a pose, a programmer with code brackets, an artist with a paintbrush. All standing together looking excited and ready. Pastel pink and mint green background, golden sparkle effects. Inclusive and encouraging mood, everyone has value to share, 16:9.",tip:"כל מודול בקורס בנוי על הקודם. מומלץ לעבור על כל השיעורים לפי הסדר כדי לקבל את התמונה המלאה.",icons:[{d:"אנשים",p:"Group of diverse people with skill icons, celebration, transparent background."},{d:"לב",p:"Pink heart with gold sparkle, encouragement, transparent background."}]}
+]}
+]},
+{m:"מודול 1: מציאת הנושא המנצח שלך",icon:"🎯",lessons:[
+{t:"שיעור 1.1: הידע הייחודי שלך",d:"7 דקות",segs:[
+{time:"0:00-1:00 – פתיחה",body:"חיוך חם וכנה, ידיים גלויות",script:"שלום וברוכים הבאים לשיעור הראשון! אני שמחה שאתם כאן. במודול הזה נתחיל מהבסיס הכי חשוב – איך למצוא את הנושא המושלם לקורס שלכם. הנושא הנכון הוא לא בהכרח זה שאתם הכי טובים בו. הנושא הנכון הוא זה שבו יש לכם ידע אמיתי, שנותן מענה לצורך של אנשים, ושהם מוכנים להשקיע בו.",ai:"A beautifully styled home office flat lay photograph. A cream-colored wooden desk with an open notebook showing handwritten notes, a gold pen, a steaming cup of coffee in a pastel pink mug, and a glowing vintage lightbulb illustration floating above. Soft natural lighting from left side. Color palette: baby pink, mint green, warm gold accents. Clean minimalist composition with plenty of white space. Professional course thumbnail style, 16:9 aspect ratio.",icons:[{d:"נורה",p:"Animated bouncing lightbulb, glowing gold, cartoon, transparent background, kawaii."},{d:"כוכב",p:"Sparkling gold star with twinkle trail, cute flat, transparent background."}]},
+{time:"1:00-2:30 – שלושת העיגולים",body:"דברו בביטחון, תנועות ידיים פתוחות",script:"בואו נדבר על שלושת העיגולים שחייבים להיפגש בנושא שלכם. עיגול ראשון – מומחיות: תחום שאתם באמת מבינים בו לעומק. עיגול שני – ביקוש: אנשים מחפשים פתרונות ותשובות בתחום הזה. עיגול שלישי – כדאיות כלכלית: אנשים מוכנים לשלם כדי ללמוד את זה. כשכל שלושת העיגולים נפגשים – שם נמצא הזהב.",ai:"A clean modern infographic showing three overlapping circles forming a Venn diagram. Left circle in soft pink labeled EXPERTISE (מומחיות), right circle in mint green labeled DEMAND (ביקוש), bottom circle in warm gold labeled PROFITABILITY (כדאיות). Where all three overlap in the center: a bright glowing gold star with sparkle effects. White background, thin elegant borders on each circle, Hebrew text labels. Flat design style, professional presentation graphic, 16:9.",icons:[{d:"3 עיגולים",p:"Three circles bouncing in one by one, pink mint gold, flat vector, transparent background."},{d:"כוכב במרכז",p:"Golden star appearing at intersection with sparkle burst, transparent background."}]},
+{time:"2:30-4:00 – תרגיל: זיהוי הכישרונות",body:"🖊️ הכניסו אייקון קופץ של דף ועט",iconcue:"כשאומרים 'קחו דף ועט' – הכניסו אייקון קופץ של דף ועט",script:"עכשיו תורכם לפעולה. קחו דף ועט ורשמו עשר תשובות לשאלות הבאות: מהם הנושאים שאנשים פונים אליכם בקשר אליהם שוב ושוב? מה אתם מסוגלים ללמד בשעה אחת שאדם אחר יצטרך ימים כדי להבין? מהי הבעיה המרכזית שאנשים בתחום שלכם מתמודדים איתה? רשמו עשר תשובות – אלו הם הגרעינים שמהם ייצמח הקורס שלכם.",ai:"An overhead photograph of a creative brainstorming session. A white surface covered with colorful sticky notes in pastel pink, mint green, and light gold. Some notes have Hebrew handwriting, others have small sketches and icons. Thin lines connect related notes forming a mind map pattern. A gold pen lies diagonally across the corner. Warm overhead lighting casting soft shadows. Creative energy atmosphere, organized chaos aesthetic. Professional flat lay photography, 16:9.",icons:[{d:"דף ועט",p:"Cute notepad with pencil writing by itself, bouncing pop-in, pink paper gold pencil, transparent background."},{d:"מוח",p:"Cartoon brain with idea bubbles popping, pink mint, transparent background."}]},
+{time:"4:00-5:30 – בדיקת כדאיות",body:"תנועת יד פתוחה כשמדגישים",script:"עכשיו נבדוק האם הרעיון שלכם באמת שווה כסף. חיפוש בגוגל – הקלידו את הנושא ובדקו כמה תוצאות קיימות. בדקו ביוטיוב ובאטסי – חפשו קורסים דומים, הסתכלו על דירוגים ומחירים. כנסו לקבוצות פייסבוק – קראו שאלות שאנשים שואלים. ככל שיש יותר שאלות – יש יותר ביקוש.",ai:"A modern split-screen digital mockup showing market research tools. Top left: a Google Trends graph with a rising green line on white background. Top right: a YouTube-style search results page showing course thumbnails. Bottom left: an online marketplace catalog with course cards showing star ratings and prices. Bottom right: a social media feed with question posts. Clean UI design, soft shadows, pastel pink and mint accent colors on white background. Professional digital marketing infographic, 16:9.",icons:[{d:"זכוכית מגדלת",p:"Magnifying glass with sparkle, bouncing search icon, gold rim, transparent background."},{d:"גרף עולה",p:"Rising chart with arrow up, mint green, bounce, transparent background."}]},
+{time:"5:30-7:00 – הנוסחה המנצחת",body:"חיוך רחב וכנה, אנרגיה של סיכום",script:"קחו את הנושא שבו יש לכם ידע עמוק ושגם הראיתם שיש לו ביקוש אמיתי. זכרו: אתם לא צריכים להיות המומחים המובילים בעולם. אתם צריכים להיות המומחים הנכונים עבור קהל היעד הספציפי שלכם. זה ההבדל.",ai:"A stylized illustration of a person writing on a glass whiteboard. The formula is displayed in elegant gold lettering: YOUR EXPERTISE + MARKET DEMAND + PROFIT POTENTIAL = PERFECT COURSE TOPIC. Each element has a small matching icon (brain for expertise, magnifying glass for demand, coin stack for profit, golden star for perfect topic). Soft pink background with mint green highlights. Modern flat illustration style, confident female figure, professional atmosphere. 16:9 aspect ratio.",tip:"משימה: רשמו את הנושא במשפט אחד: אני מלמד/ת _____ ל_____ שרוצים ל_____.",icons:[{d:"גביע",p:"Golden trophy with sparkles bouncing in, 3D cartoon, transparent background."}]}
+]},
+{t:"שיעור 1.2: מחקר שוק מהיר",d:"7 דקות",segs:[
+{time:"0:00-1:00 – פתיחה",body:"ישיבה יציבה, ביטחון שקט",script:"בשיעור הקודם בחרתם נושא. עכשיו נוודא שאנשים באמת רוצים אותו ומוכנים להשקיע בו. זה בדיוק השלב שמפריד בין קורס שנשאר מאחורי הקלעים לבין קורס שנמכר מהרגע הראשון.",ai:"An artistic flat lay composition showing market research concept. A large ornate magnifying glass with gold rim hovering over printed charts and graphs showing rising trends. Scattered around: small golden coin illustrations, bar chart printouts, a tablet showing analytics dashboard. Pastel pink background surface, mint green data highlights, gold accent elements. Soft overhead lighting, professional product photography style. Clean and modern, 16:9.",icons:[{d:"מטבעות",p:"Gold coins bouncing, cute cartoon money, sparkle, transparent background."}]},
+{time:"1:00-3:00 – כלים למחקר",body:"הצביעו על המסך כשמציגים כל כלי",script:"Google Trends – הקלידו את הנושא ובדקו האם העניין בו עולה או יורד. AnswerThePublic – כלי מדהים שמראה את כל השאלות שאנשים שואלים. כל שאלה שעולה שם היא שיעור פוטנציאלי. Udemy ו-Skillshare – בדקו מתחרים. Amazon Kindle – ספרים מצליחים מעידים על ביקוש.",ai:"A clean digital mockup showing four browser windows arranged in a 2x2 grid on a soft pink desktop background. Each window shows a simplified version of a research tool: (1) Google Trends with a colorful rising line graph, (2) AnswerThePublic with a circular question wheel visualization, (3) Udemy marketplace with course cards and star ratings, (4) Amazon Kindle books section with bestseller covers. Each window has a subtle mint green border. Modern UI design, realistic browser chrome, 16:9.",icons:[{d:"4 כלים",p:"Four tool icons popping in sequence, colorful bounce, transparent background."}]},
+{time:"3:00-5:00 – ניתוח מתחרים",body:"ידיים משולבות, ביטחון",script:"אל תחששו ממתחרים – הם בעלי הברית הטובים שלכם. בדקו: מה הם עושים נכון? מה חסר אצלם? מה התלמידים מתלוננים עליו? האסטרטגיה – לא להעתיק, אלא ליצור גרסה שמשלימה את מה שחסר.",ai:"A dramatic close-up photograph of a chess board with elegant wooden pieces. One golden queen piece stands tall in the center, catching warm light and glowing, while surrounding pieces are in soft muted tones. The golden queen represents your unique strategic position in the market. Shallow depth of field, warm lighting from the side, dark moody background. Professional product photography feel. Metaphor for competitive strategy. 16:9.",icons:[{d:"שחמט",p:"Golden chess queen bouncing, strategy icon, transparent background."}]},
+{time:"5:00-7:00 – הצעת הערך הייחודית",body:"דברו ברוגע ובביטחון",script:"הנוסחה: מה שאתם נותנים בתוספת מה שאף אחד אחר לא נותן – שווה את המקום הייחודי שלכם בשוק. כתבו את הצעת הערך הייחודית שלכם במשפט אחד!",ai:"A modern illustration showing a glowing golden trophy cup in the center with the text UVP (Unique Value Proposition) engraved on it. Surrounding the trophy: floating icons representing course elements - a play button, a lightbulb, a target, a heart, a graduation cap. Each icon in alternating mint green and soft pink. Gold sparkle effects around the trophy. Clean white background with subtle radial gradient. Celebration and achievement mood, flat design style. 16:9.",tip:"אם לא מצליחים לנסח במשפט אחד – הקורס עדיין לא ממוקד מספיק.",icons:[{d:"יהלום",p:"Sparkling diamond bouncing, unique value, pastel, transparent background."}]}
+]},
+{t:"שיעור 1.3: הגדרת קהל היעד",d:"7 דקות",segs:[
+{time:"0:00-1:00 – למה אווטאר",body:"חיוך חם, ישיבה קדימה",script:"אחת הטעויות הנפוצות – אנשים משקיעים חודשים בבניית קורס ומגלים שאף אחד לא קונה. הסיבה? לא הגדירו למי בדיוק מדברים. כשמדברים עם כולם – אף אחד לא מרגיש שדיברתם אליו.",ai:"A side-by-side before and after illustration. LEFT side (muted colors, gray tones): a person standing at a crossroads with multiple confusing arrows pointing in all directions, question marks floating above their head, foggy background. RIGHT side (vibrant pastel colors): the same person confidently walking toward a clear bullseye target, single golden arrow pointing forward, bright sunny background with pink and mint accents. Clean modern illustration style, 16:9.",icons:[{d:"מטרה",p:"Bullseye target with arrow hitting center, bounce, transparent background."}]},
+{time:"1:00-3:30 – יצירת אווטאר",body:"דברו כאילו מתארים חברה",script:"ענו על השאלות: מה השם, בן כמה? מה עושה ביום יום? מהי הבעיה הגדולה ביותר? מה כבר ניסה שלא עבד? באילו פלטפורמות צורך תוכן? כמה מוכן להשקיע? ככל שהתשובות ספציפיות – הקורס ימכור טוב יותר.",ai:"A beautifully designed customer avatar worksheet laid out on a cream desk surface. The worksheet has sections with headers in gold: Name, Age, Pain Points, Goals, Platforms, Budget. Each section is filled with colorful sticky notes in pink and mint. A small illustrated persona card in the corner shows a friendly face icon with key demographics. Gold paperclips and a pink pen complete the scene. Professional template design, organized and visually appealing, 16:9.",icons:[{d:"אווטאר",p:"Cartoon person with info cards floating, pastel, transparent background."}]},
+{time:"3:30-5:30 – חמש דרכים לדבר עם הקהל",body:"דברו בביטחון",script:"סקרים ברשתות חברתיות. קבוצות פייסבוק. שיחות ישירות עם חמישה עד עשרה אנשים. קריאת ביקורות של מתחרים. שאלות ממוקדות בבינה מלאכותית.",ai:"A modern infographic showing five audience research channels connected by elegant golden dotted lines in a star pattern. Each channel is represented by a distinct icon in a soft pink circle: (1) Social media megaphone, (2) Group chat bubbles, (3) Phone handset for calls, (4) Star rating for reviews, (5) AI brain chip. Center connection point glows gold. Clean white background, thin golden connection lines, professional data visualization style. Hebrew labels under each icon. 16:9.",icons:[{d:"5 ערוצים",p:"Five icons bouncing in sequence, colorful flat, transparent background."}]},
+{time:"5:30-7:00 – סיכום",body:"חיוך חם",script:"מצאנו נושא, בדקנו שוק, הגדרנו למי מדברים. בשיעור הבא נבנה את המבנה!",ai:"A celebratory completion graphic showing three large checkmarks in a row, each inside a rounded rectangle card. First card (pink): TOPIC FOUND with lightbulb icon. Second card (mint): MARKET VALIDATED with chart icon. Third card (gold): AUDIENCE DEFINED with target icon. Colorful confetti particles falling from above in pink, mint, and gold. Clean white background, modern card UI design, celebration mood. Hebrew text labels. 16:9.",tip:"מלאו את דף אווטאר הלקוח – ילווה אתכם לאורך הקורס.",icons:[{d:"3 וי",p:"Three checkmarks popping one by one, mint green, transparent background."}]}
+]}
+]},
+{m:"מודול 2: מבנה ותכנון הקורס",icon:"🏗️",lessons:[
+{t:"שיעור 2.1: מפת הקורס",d:"7 דקות",segs:[
+{time:"0:00-1:30 – מאיפה לאיפה",body:"תנועות ידיים פתוחות",script:"כל קורס מצליח הוא מסע מנקודה A לנקודה B. נקודה A – איפה התלמיד עכשיו עם הכאבים. נקודה B – איפה יהיה אחרי הקורס. הקורס שלכם הוא הגשר.",ai:"A beautiful watercolor-style illustration of a winding path through a gentle landscape. Starting point A marked with a soft pink flag on the left, ending point B marked with a golden flag on the right. The path winds through rolling pastel green hills with small milestone markers along the way. Soft watercolor texture, dreamy atmosphere, baby pink sky with mint green ground. The journey metaphor for course structure. Artistic and inspiring, 16:9.",icons:[{d:"דרך",p:"Path from A to B with footsteps, pastel pink, gold markers, transparent background."}]},
+{time:"1:30-3:30 – חלוקה למודולים",body:"הצביעו על המסך",script:"המבנה האידיאלי: ארבעה עד שישה מודולים, שלושה עד חמישה שיעורים בכל אחד, שבע עד שמונה דקות לשיעור. למה דווקא כך? מחקרים מראים שזה טווח הריכוז המושלם.",ai:"An architect-style blueprint layout showing a course structure plan. A large rectangular frame with elegant golden annotations and connecting lines. Inside: six module cards arranged in a flowing sequence, each card in alternating soft pink and mint green with a number and title placeholder. Golden arrows connect the modules showing progression. Thin blueprint grid lines in the background, dark navy blue base with gold and pastel highlights. Professional planning aesthetic, 16:9.",icons:[{d:"לבנים",p:"Building blocks stacking in pastel colors, transparent background."}]},
+{time:"3:30-5:30 – תוצאות למידה",body:"הצביעו למצלמה",script:"לכל שיעור חייבת תוצאת למידה ברורה: בסוף השיעור התלמיד ידע או יוכל _____. זה נותן מיקוד, ניווט, ואמינות.",ai:"A beautifully designed learning outcomes checklist on premium cream-colored paper. Five outcome lines written in elegant typography, each preceded by a golden checkmark with subtle sparkle effect. The header reads LEARNING OUTCOMES in gold. Soft pink decorative border, mint green accent line on the left side. A golden pen rests at the bottom. Professional document design, warm lighting, shallow depth of field. 16:9.",icons:[{d:"צ'קליסט",p:"Checklist checking itself off, gold on pink paper, transparent background."}]},
+{time:"5:30-7:00 – סיכום",body:"חיוך חם",script:"המשימה: מלאו את מפת הקורס – נקודה A, נקודה B, וכל המודולים ביניהם.",ai:"An overhead flat lay photograph of a hand-drawn course map spread across a wooden desk. The map shows a journey from START to FINISH with module stops marked by golden push pins. Colored threads in pink and mint connect the pins showing the learning path. Surrounding items: a compass with gold details, a small notebook, and a cup of coffee. Warm natural lighting, adventure and planning mood. Professional photography, 16:9.",tip:"מבנה שיעור: פתיחה → תוכן → סיכום → משימה",icons:[{d:"מפה",p:"Treasure map unrolling with golden X, transparent background."}]}
+]},
+{t:"שיעור 2.2: כתיבת תסריטים",d:"8 דקות",segs:[
+{time:"0:00-2:00 – מבנה התסריט",body:"דברו בביטחון",script:"כל תסריט בנוי משלושה חלקים. פתיחה עם הוק – שלושים שניות שתופסות מיד. תוכן עיקרי – ארבע עד חמש דקות של הוראה וסיפורים. סיכום – דקה עד שתיים של חזרה וטיזר.",ai:"A cozy desk scene with a warm vintage desk lamp casting golden light. On the desk: an open notebook showing a script template with three clearly labeled sections - HOOK (opening) highlighted in pink, CONTENT (main body) in mint green, and SUMMARY (closing) in gold. A microphone icon sketched in the margin. Warm amber lighting, wooden desk texture, creative writing atmosphere. Professional content creation workspace, 16:9.",icons:[{d:"קלאפר",p:"Movie clapperboard snapping, black gold, transparent background."}]},
+{time:"2:00-4:00 – טכניקות כתיבה",body:"דברו בטון חברי",script:"דברו כמו שמדברים עם חברה טובה. ספרו סיפורים אישיים. תנו טיפים מעשיים. שאלו שאלות רטוריות – הן שומרות את התלמיד מעורב.",ai:"A comparison illustration showing two speech bubble styles side by side. LEFT (cold, gray): a rigid rectangular speech bubble with formal stiff text, frosty blue tone, robotic feeling. RIGHT (warm, highlighted): a friendly rounded speech bubble with conversational text, glowing warm gold border, pink and mint accents, heart and smile icons nearby. An arrow points from cold to warm with the message: TALK LIKE THIS. Clean white background, modern illustration style, 16:9.",icons:[{d:"בועות שיחה",p:"Two chat bubbles, gray to pink with heart, transparent background."}]},
+{time:"4:00-8:00 – דוגמה חיה",body:"הציגו דוגמה",script:"הנה פתיחה מוצלחת: הידעתם שרוב היוצרים נתקעים דווקא בשלב התוכן? היום אראה לכם איך לפתור. ואז תוכן – הסוד הוא מבנה ברור לפני המצלמה. וסיכום – תוכן ברור הוא הבסיס.",ai:"A professional script template layout shown on a tablet screen. Three distinct sections clearly color-coded: OPENING HOOK section at top with attention-grabbing pink header and lightning bolt icon (30 seconds), MAIN CONTENT section in the middle with mint green header and lightbulb icon (4-5 minutes), SUMMARY section at bottom with golden header and star icon (1-2 minutes). Time stamps on the right side. Modern UI design, clean typography, professional course creation tool aesthetic, 16:9.",tip:"כתבו כמו שמדברים – לא כמו חיבור.",icons:[{d:"עט",p:"Golden pen writing line by line, sparkle trail, transparent background."}]}
+]}
+]},
+{m:"מודול 3: יצירת התוכן לקורס",icon:"🎥",lessons:[
+{t:"שיעור 3.1: הקלטת וידאו בתקציב נמוך",d:"7 דקות",segs:[
+{time:"0:00-2:00 – ציוד בתקציב אפס",body:"הצביעו על הציוד",script:"לא צריכים אולפן יקר. הטלפון החכם שלכם מצלם מדהים. אור טבעי מהחלון הוא הטוב ביותר. רקע נקי ופשוט. וההשקעה הכי חשובה – מיקרופון USB בסיסי.",ai:"A photograph of a budget-friendly home recording setup arranged beautifully. Center: a modern smartphone mounted on a small affordable tripod. Behind it: a window with sheer white curtains letting in beautiful soft natural light. To the right: a simple USB microphone on a small desk stand. The background is a clean, minimally decorated wall with a small plant. Price tags in gold showing affordable prices next to each item. Warm natural lighting, accessible and encouraging mood. Shows anyone can start recording. 16:9.",icons:[{d:"טלפון",p:"Smartphone on tripod bouncing, camera sparkle, transparent background."},{d:"מיקרופון",p:"USB mic popping with sound waves, transparent background."}]},
+{time:"2:00-4:00 – הקלטה בלי פנים",body:"הציגו דוגמאות",script:"סליידים עם קריינות. הקלטת מסך. Loom – מקליט מסך עם פנים בפינה. OBS Studio – חינמי ומקצועי.",ai:"A screen recording mockup showing a presentation being recorded. The main area displays a clean slide with course content. In the bottom-left corner: a circular webcam window showing a friendly presenter. Top bar shows recording controls with a red record button, timer, and pause button. The slide has a pastel pink and mint color scheme. Subtle Loom-style UI elements. Modern screen capture aesthetic, professional yet accessible. Shows how to record without showing your face or with a small face bubble. 16:9.",icons:[{d:"מסך",p:"Screen with face circle in corner, transparent background."}]},
+{time:"4:00-7:00 – עריכה בסיסית",body:"הציגו תוכנות",script:"DaVinci Resolve – חינמי וברמה של הוליווד. CapCut – פשוט ויפה. Canva Video – הכי אינטואיטיבי.",ai:"Three app interface mockups displayed side by side on a modern desktop. LEFT: DaVinci Resolve with a professional dark timeline interface and the label FREE in gold. CENTER: CapCut with a colorful mobile-friendly editing view and auto-subtitle feature highlighted. RIGHT: Canva Video with a drag-and-drop visual editor and template gallery. Each app has a difficulty rating (stars) below it. Clean comparison layout, soft pink background between the windows. Professional software review style, 16:9.",tip:"הקליטו את השיעור הראשון עוד היום!",icons:[{d:"מספריים",p:"Scissors cutting film strip, gold, transparent background."}]}
+]},
+{t:"שיעור 3.2: חומרים נלווים",d:"7 דקות",segs:[
+{time:"0:00-3:00 – דפי עבודה",body:"הציגו דוגמאות",script:"חומרים נלווים מעלים את הערך בצורה דרמטית. Canva – חינמית, אלפי תבניות. צרו דפי עבודה, צ'קליסטים, מדריכים.",ai:"A flat lay arrangement of beautifully designed course worksheets and templates. Multiple printed pages fanned out showing different designs: a checklist with golden checkmarks, a fill-in-the-blank exercise in soft pink, a mind map template in mint green, a progress tracker with colorful bars. A tablet in the corner shows the Canva design interface. Gold paper clips and a pink highlighter complete the scene. Professional template showcase, inspiring and achievable aesthetic, 16:9.",icons:[{d:"דפים",p:"Colorful pages fanning out, pink mint gold, transparent background."}]},
+{time:"3:00-5:00 – מצגות",body:"הציגו כללי עיצוב",script:"עיצוב אחיד – שניים שלושה צבעים ופונט אחד. פחות טקסט. תמונות איכותיות.",ai:"A dramatic before and after comparison of slide design. LEFT side labeled BEFORE (with X): a cluttered slide crammed with tiny text, mismatched fonts, a blurry image, and clashing colors - clearly amateur. RIGHT side labeled AFTER (with checkmark): the same content redesigned beautifully with clean typography, one key message, a high-quality image, consistent pink-mint-gold color palette, and plenty of white space. Clear improvement arrows between them. Professional design tutorial style, 16:9.",icons:[{d:"לפני/אחרי",p:"Messy slide to clean slide transformation, transparent background."}]},
+{time:"5:00-7:00 – סיכום",body:"חיוך, אנרגיה",script:"משימה: צרו שלושה סליידים, הקליטו, ערכו, וצפו!",ai:"An illustration of a happy person sitting at a modern desk completing their first course content. Their laptop screen shows a completed video editing timeline. A progress bar on screen shows 100% complete with a golden glow. Above their head: floating achievement badges and a small celebration confetti burst. Warm pastel workspace with plants, good lighting, and a motivational poster on the wall. Encouraging completion mood, modern flat illustration style, 16:9.",tip:"תבנית אחידה לכל הקורס חוסכת שעות.",icons:[{d:"רקטה",p:"Rocket launching with sparkle, pink gold, transparent background."}]}
+]},
+{t:"שיעור 3.3: אלמנטים קופצים",d:"8 דקות",segs:[
+{time:"0:00-1:30 – מה ולמה",body:"הציגו לפני/אחרי",script:"אלמנטים קופצים – אייקונים, סטיקרים ואנימציות שמופיעות על המסך בזמן שמדברים. הם הופכים וידאו רגיל לחוויה ויזואלית מרתקת. זה הרבה יותר פשוט ממה שנדמה.",ai:"A side-by-side comparison of two video player frames. LEFT labeled BEFORE: a plain talking-head video with no graphics, static boring frame, gray mood. RIGHT labeled AFTER: the same video transformed with animated bouncing icons, colorful lower third text, floating emoji reactions, subtle background animation - much more engaging and professional. Golden arrow between them labeled TRANSFORMATION. The difference is dramatic and inspiring. Modern video production comparison, 16:9.",icons:[{d:"לפני/אחרי",p:"Plain frame to exciting frame with stickers, transparent background."}]},
+{time:"1:30-3:30 – מאיפה להשיג",body:"הציגו כל אתר",script:"LottieFiles – אנימציות חינמיות. Flaticon – אייקונים. Canva – סטיקרים מובנים. CapCut – אפקטים מדהימים. Giphy – GIF מונפשים. Midjourney ו-DALL-E – סטיקרים מותאמים ב-AI.",ai:"A modern resource grid showing six animation and icon sources arranged in two rows of three on a soft pink background. Each source displayed in a clean white card with rounded corners: (1) LottieFiles with a bouncing animation preview, (2) Flaticon with colorful icon samples, (3) Canva with sticker examples, (4) CapCut with video effects preview, (5) Giphy with animated GIF samples, (6) Midjourney/DALL-E with AI-generated sticker examples. Each card has a FREE or AI badge in gold. Professional resource guide layout, 16:9.",icons:[{d:"6 מקורות",p:"Six app icons appearing in grid, each with sparkle, transparent background."}]},
+{time:"3:30-5:30 – הוספה ב-CapCut ו-Canva",body:"הציגו הדרכה",script:"ב-CapCut: Stickers, חפשו, גררו לטיימליין, התאימו. ב-Canva Video: Elements, Animated Sticker, גררו. הכל דראג אנד דרופ!",ai:"A tutorial-style screenshot showing two editing interfaces. TOP half: CapCut video editor with a sticker being dragged from the sticker panel onto the timeline - arrow showing the drag motion, the sticker highlighted with a golden glow. BOTTOM half: Canva Video editor with an animated element being dragged from the Elements panel to the canvas. Both show the simple drag-and-drop process with numbered step indicators (1, 2, 3). Easy to follow visual guide, 16:9.",icons:[{d:"גרירה",p:"Hand cursor dragging sticker, sparkle trail, transparent background."}]},
+{time:"5:30-7:00 – יצירה ב-AI",body:"דברו בהתרגשות",script:"הסוד: כתבו פרומפט כמו Cute animated sticker of... cartoon style, transparent background. הורידו והשתמשו. כל הפרומפטים בלשונית אייקונים!",ai:"A magical illustration showing the AI image generation process. On the left: a text prompt typed in a search bar reading Cute animated lightbulb, bouncing, transparent background. In the middle: sparkle and magic wand effects showing the transformation process. On the right: the finished result - a perfect cute animated lightbulb sticker with transparent background, ready to use. Golden sparkle trail connecting prompt to result. Shows how easy AI sticker creation is. Modern tech-magic aesthetic, 16:9.",icons:[{d:"שרביט",p:"Magic wand creating sparkles and stickers, gold, rainbow, transparent background."}]},
+{time:"7:00-8:00 – טיפים",body:"סיכום",script:"שניים שלושה אלמנטים לדקה מקסימום. תזמון מדויק. עקביות בסגנון. הסרת רקע ב-remove.bg.",ai:"Four elegant tip cards arranged in a 2x2 grid on a soft cream background. Each card has a distinct pastel color border and icon: (1) Pink card with clock icon: 2-3 elements per minute maximum, (2) Mint card with target icon: Precise timing with your speech, (3) Gold card with palette icon: Consistent style throughout, (4) White card with scissors icon: Remove backgrounds at remove.bg. Each card has clean typography and subtle shadow. Professional tips layout, actionable advice format, 16:9.",tip:"האלמנטים תומכים במסר – לא מסיחים.",icons:[{d:"4 טיפים",p:"Four tip stars with icons, transparent background."}]}
+]}
+]},
+{m:"מודול 4: הפלטפורמה הטכנית",icon:"💻",lessons:[
+{t:"שיעור 4.1: בחירת פלטפורמה",d:"8 דקות",segs:[
+{time:"0:00-3:00 – השוואה",body:"הציגו טבלה",script:"Teachable – פופולרית וקלה. Thinkific – תוכנית חינמית. Gumroad – פשוט. Udemy – שוק מובנה עצום. WordPress עם LearnDash – שליטה מלאה. Etsy – קורסי PDF עם קהל קיים.",ai:"Six platform comparison cards arranged in a clean grid layout. Each card features a simplified logo and key info: (1) Teachable - Popular, Easy, with 4.5 stars, (2) Thinkific - Free plan available, 4 stars, (3) Gumroad - Simplest option, 4 stars, (4) Udemy - Built-in marketplace, massive audience, 4.5 stars, (5) WordPress + LearnDash - Full control, 4 stars, (6) Etsy - PDF courses, existing audience, 3.5 stars. Soft pink background, gold star ratings, mint green highlights for FREE features. Platform selection guide aesthetic, 16:9.",icons:[{d:"6 פלטפורמות",p:"Six cards flipping in one by one, transparent background."}]},
+{time:"3:00-5:30 – הקמה",body:"הצביעו על כל צעד",script:"פתחו חשבון. הגדירו שם ותיאור. העלו סילבוס. העלו תוכן. הגדירו מחיר. פרסמו!",ai:"An illustrated path of six stepping stones leading upward from left to right, each stone numbered 1-6 in elegant gold. Stone 1: Open Account (user icon), Stone 2: Set Name and Description (pencil icon), Stone 3: Upload Syllabus (document icon), Stone 4: Upload Content (video icon), Stone 5: Set Price (tag icon), Stone 6: Publish! (rocket icon). The path goes from ground level to a cloud with a golden glow. Pastel pink and mint stepping stones, encouraging progression metaphor, 16:9.",icons:[{d:"מדרגות",p:"Steps ascending with footprints, rainbow, transparent background."}]},
+{time:"5:30-8:00 – דף מכירה",body:"ביטחון",script:"דף המכירה הוא המוכר האמיתי. צריך: כותרת מושכת, מה ילמדו, למי מתאים, מחיר ברור עם קריאה לפעולה, עדויות ובונוסים, אחריות.",ai:"A detailed wireframe mockup of an ideal course sales page displayed on a laptop screen. Clearly labeled sections from top to bottom: (1) HERO SECTION with compelling headline and CTA button in gold, (2) WHAT YOU WILL LEARN with benefit bullet points, (3) WHO IS THIS FOR with avatar descriptions, (4) PRICING with a highlighted package in gold border, (5) TESTIMONIALS with photo placeholders and star ratings, (6) BONUS section in mint green, (7) GUARANTEE badge in pink, (8) FINAL CTA button. Clean wireframe style with pastel color annotations, 16:9.",tip:"דף המכירה חייב להיות מותאם לנייד!",icons:[{d:"כפתור",p:"BUY button with click sparkle, gold, transparent background."}]}
+]}
+]},
+{m:"מודול 5: שיווק ומכירות",icon:"📣",lessons:[
+{t:"שיעור 5.1: אסטרטגיות שיווק",d:"8 דקות",segs:[
+{time:"0:00-2:30 – משפך שיווקי",body:"תנועות ידיים פתוחות",script:"שלב ראשון: תוכן חינמי שנותן ערך ומושך. שלב שני: הצעת השקה במחיר מיוחד. שלב שלישי: מכירה במחיר מלא עם בונוסים ואחריות.",ai:"A beautiful 3D illustration of a marketing funnel seen from a slight angle. The funnel has three distinct layers: TOP (wide, pink): FREE CONTENT showing social media posts and blog icons flowing in. MIDDLE (medium, mint): LAUNCH OFFER showing an email and special price badge. BOTTOM (narrow, gold): FULL SALE showing a golden checkout button and happy customer icon. Golden sparkles flow through the funnel. Small people figures moving through each stage. Clean 3D rendering, professional marketing visualization, 16:9.",icons:[{d:"משפך",p:"Golden funnel with people flowing, transparent background."}]},
+{time:"2:30-5:00 – נוסחת AIDA",body:"דברו בביטחון",script:"Attention – תפסו תשומת לב. Interest – ספרו מה ילמדו. Desire – ציירו את התוצאה. Action – קריאה לפעולה ברורה.",ai:"A horizontal infographic showing the AIDA marketing formula as four connected stages. Stage A (Attention): a large eye icon in pink with radiating attention lines. Stage I (Interest): a glowing lightbulb in mint green with information icons. Stage D (Desire): a red and pink heart with dream-like sparkles and transformation imagery. Stage A (Action): a launching gold rocket with a BUY NOW button below it. Each stage connected by elegant golden arrows. Clean modern marketing infographic style with Hebrew labels, 16:9.",icons:[{d:"AIDA",p:"A-I-D-A with icons, sequential pop-in, transparent background."}]},
+{time:"5:00-8:00 – רשימת תפוצה",body:"אנרגיה",script:"ליד מגנט – מדריך חינמי. סדרת מיילים אוטומטית. קידום ברשתות. שותפויות בתחומים משלימים.",ai:"A modern illustration of email marketing and lead magnet strategy. Center: a large stylized email envelope opening to reveal a golden guide/ebook (the lead magnet) with sparkle effects. Flowing out from the envelope: a chain of automated email icons in sequence (1, 2, 3, 4, 5) representing the nurture sequence. Around the scene: social media icons feeding subscribers into the email, and partnership handshake icons. Pastel pink and mint color scheme, golden email highlights. Marketing automation visualization, 16:9.",tip:"השקה היא תהליך מתמשך. כל השקה מלמדת.",icons:[{d:"מעטפה",p:"Envelope opening with confetti, pink gold, transparent background."}]}
+]}
+]},
+{m:"מודול 6: אוטומציה והכנסה פסיבית",icon:"🤖",lessons:[
+{t:"שיעור 6.1: אוטומציה וסקיילינג",d:"7 דקות",segs:[
+{time:"0:00-3:00 – מערכות אוטומטיות",body:"התרגשות",script:"Mailchimp, ConvertKit, MailerLite – מיילים אוטומטיים עשרים וארבע שעות. Buffer ו-Later – תזמון פוסטים. Zapier – חיבור בין מערכות.",ai:"A sleek automation workflow diagram showing connected tools and processes. Three main tool icons in a row: (1) Email platform (Mailchimp/ConvertKit style) in pink, (2) Social media scheduler (Buffer style) in mint, (3) Integration hub (Zapier style) in gold. Golden arrows flow between all three showing automated connections. Small clock icons indicate 24/7 operation. Data flow lines connect to a central dashboard showing analytics. Dark background with glowing neon-pastel elements, futuristic automation aesthetic, 16:9.",icons:[{d:"גלגלים",p:"Three gears spinning, gold silver mint, transparent background."}]},
+{time:"3:00-5:00 – סקיילינג",body:"ידיים פתוחות",script:"קורס מתקדם. חבילות Premium ו-VIP. קהילה מקוונת. שותפויות עם עמלה.",ai:"An artistic illustration of a flourishing money tree growing from a small pot labeled YOUR COURSE. The tree trunk is strong and golden. Four main branches, each bearing different fruits: (1) Pink branch: Advanced Course with course icons, (2) Mint branch: Premium Packages with VIP badge, (3) Gold branch: Community Membership with people icons, (4) Green branch: Affiliate Partnerships with handshake icons. Each branch has golden coins as leaves. Warm sunset background, growth and abundance metaphor. Inspiring and achievable mood, 16:9.",icons:[{d:"עץ",p:"Seed growing into money tree, transparent background."}]},
+{time:"5:00-7:00 – סיום",body:"חיוך רחב, חגיגה",script:"במודולים הבאים נלמד על אביזרים, שפת גוף, ביטחון מול מצלמה, ואיך לדעת שהקורס מוכן להשקה. נתראה בהמשך!",ai:"A warm celebration illustration showing course milestones completed. Center: a golden graduation cap floating with a tassel and sparkle effects. Below it: a laptop showing a completed course dashboard. Surrounding elements: golden trophy, colorful confetti in pink and mint, floating checkmark badges, a small calendar showing progress. Warm golden lighting, celebration mood. The message: you are ready for the next modules. Inspiring completion aesthetic, 16:9.",tip:"הצעד הראשון: פתחו את הבונוסים והתחילו!",icons:[{d:"קונפטי",p:"Confetti explosion with trophy, all pastels, transparent background."},{d:"לב",p:"Pink heart with sparkles expanding, transparent background."}]}
+]}
+]},
+{m:"מודול 7: אביזרים ותוכנות",icon:"🛠️",lessons:[
+{t:"שיעור 7.1: ציוד הקלטה בתקציב",d:"8 דקות",segs:[
+{time:"0:00-2:00 – מצלמה ותאורה",body:"הציגו כל פריט",script:"הטלפון שלכם הוא המצלמה. חצובה – שלושים עד חמישים שקל. אור טבעי מחלון – הטוב ביותר. רינג לייט – שישים עד מאה שקל.",ai:"A clean product photography lineup of budget recording equipment arranged on a white surface. From left to right: a modern smartphone on a small tripod (tag: 0₪), a ring light (tag: 60-100₪), a USB microphone on stand (tag: 100₪), a simple green screen (tag: 100₪). Each item has a gold price tag. Warm studio lighting, professional product showcase style. The message: you dont need expensive gear. Encouraging and accessible, all items look approachable, 16:9.",icons:[{d:"טלפון",p:"Smartphone transforming to camera, sparkle, transparent background."}]},
+{time:"2:00-4:00 – אודיו",body:"דברו על ההבדל",script:"FIFINE K669 – מאה שקל, איכות מדהימה. Boya BY-M1 – חמישים שקל. אפילו אוזניות עם מיק עדיפות. הכלל: אודיו גרוע = עוזבים. אודיו טוב = נשארים.",ai:"A side-by-side audio quality comparison visualization. LEFT side labeled BAD AUDIO (red X): a jagged, noisy audio waveform with spikes and distortion, displayed on a dark red background. Visual representation of echo and background noise. RIGHT side labeled GOOD AUDIO (green check): a clean, smooth audio waveform with consistent levels, displayed on a calm mint green background. Golden divider line between them. Clear visual metaphor for audio quality importance. Professional audio engineering style, 16:9.",icons:[{d:"גלי קול",p:"Choppy waves transforming to smooth, red to green, transparent background."}]},
+{time:"4:00-6:00 – רקע",body:"דוגמאות טוב/רע",script:"קיר לבן, ספרייה, צמחים. גרין סקרין – מאה שקל. אור מול הפנים, לעולם לא מאחור.",ai:"A split-screen comparison of recording backgrounds. LEFT side labeled WRONG (red X): a messy room background with unmade bed, cluttered shelves, harsh overhead lighting casting unflattering shadows, bad camera angle. RIGHT side labeled RIGHT (gold check): the same room tidied up - clean bookshelf, green plant, ring light providing soft even illumination, camera at eye level. Dramatic improvement visible. Interior design meets video production, 16:9.",icons:[{d:"חדר",p:"Messy room cleaning up into styled corner, transparent background."}]},
+{time:"6:00-8:00 – רשימת קניות",body:"סיכום",script:"אפס שקל: טלפון, חלון, רקע. מאתיים שקל: חצובה ומיקרופון. חמש מאות: חצובה, מיקרופון, רינג לייט, גרין סקרין. אין תירוצים.",ai:"Three equipment budget cards arranged in ascending steps from left to right. Card 1 (FREE, pink): smartphone icon, window for light, clean wall background - labeled ZERO BUDGET START. Card 2 (200₪, mint): adds tripod and USB microphone icons - labeled BASIC UPGRADE. Card 3 (500₪, gold): adds ring light and green screen icons - labeled FULL SETUP. Each card shows exactly what equipment is included with small icons. Ascending golden arrows between cards. Encouraging pricing guide, 16:9.",tip:"התחילו עם מה שיש. שדרגו אחרי חמישה שיעורים.",icons:[{d:"3 רמות",p:"Three price badges popping, FREE 200 500, transparent background."}]}
+]},
+{t:"שיעור 7.2: תוכנות חינמיות",d:"8 דקות",segs:[
+{time:"0:00-2:30 – הקלטה",body:"הציגו כל תוכנה",script:"OBS Studio – חינמי, מקצועי. Loom – עד עשרים וחמישה סרטונים חינם. Zoom – שיעורים חיים. CapCut – הקלטה ועריכה מהטלפון.",ai:"Four software comparison cards on a soft pink background. Each card is a clean white rounded rectangle with: (1) OBS Studio - dark interface preview, Professional grade label, FREE badge in gold, (2) Loom - friendly purple interface preview, Screen + Face label, FREE 25 videos badge, (3) Zoom - blue interface preview, Live Teaching label, FREE 40 min badge, (4) CapCut - colorful mobile interface preview, Phone Recording label, FREE badge. Star ratings below each. Clean comparison layout, 16:9.",icons:[{d:"4 תוכנות",p:"Four icons in grid with free badge, transparent background."}]},
+{time:"2:30-5:00 – עריכה",body:"הציגו מסך",script:"DaVinci Resolve – חינמי, רמת הוליווד. CapCut Desktop – כתוביות אוטומטיות. Canva Video – למתחילים. iMovie – למק.",ai:"A detailed comparison layout of four free editing applications. Each shown in its own panel: (1) DaVinci Resolve with dark professional timeline, labeled Hollywood Level FREE, difficulty: 4/5 stars, (2) CapCut Desktop with colorful timeline and auto-subtitles feature highlighted, labeled Easy + Auto Captions, difficulty: 2/5, (3) Canva Video with drag-and-drop interface, labeled Beginner Friendly, difficulty: 1/5, (4) iMovie with clean Apple interface, labeled Mac Only, difficulty: 2/5. Soft pink dividers between panels, 16:9.",icons:[{d:"עריכה",p:"Scissors cutting film, gold, transparent background."}]},
+{time:"5:00-7:00 – עיצוב",body:"הציגו Canva",script:"Canva – סליידים, דפי עבודה, לוגואים, הכל. Figma – עיצוב מתקדם. Remove.bg – הסרת רקע. TinyPNG – דחיסה. Google Fonts.",ai:"A visual ecosystem map showing free design tools connected in a web. Center hub: CANVA in a large pink circle (slides, worksheets, logos, everything). Connected by golden lines to satellite tools: Figma (advanced design) in purple circle, Remove.bg (background removal) in mint circle, TinyPNG (image compression) in orange circle, Google Fonts (typography) in blue circle. Each connection line has a small icon showing what flows between tools. Clean network diagram, professional tool guide, 16:9.",icons:[{d:"פלטה",p:"Artist palette with paintbrush, rainbow pastel, transparent background."}]},
+{time:"7:00-8:00 – סיכום",body:"אנרגיה",script:"הקלטה: OBS ו-Loom. עריכה: DaVinci ו-CapCut. עיצוב: Canva. הכל חינמי ומקצועי. לכו להתקין!",ai:"A beautifully designed checklist poster titled YOUR FREE PROFESSIONAL TOOLKIT in elegant gold lettering. Three sections with golden dividers: RECORDING (OBS Studio, Loom checked off), EDITING (DaVinci Resolve, CapCut checked off), DESIGN (Canva, Remove.bg checked off). Each item has a golden checkmark and a small app icon. Footer text: Install everything today - one hour saves months. Pastel pink border, mint green checkmarks, premium poster design, 16:9.",tip:"התקינו הכל היום – שעה חוסכת חודשים.",icons:[{d:"ארגז",p:"Toolbox opening with tools flying out, transparent background."}]}
+]}
+]},
+{m:"מודול 8: שפת גוף ונוכחות",icon:"🎭",lessons:[
+{t:"שיעור 8.1: שפת גוף שמשדרת ביטחון",d:"8 דקות",segs:[
+{time:"0:00-1:30 – למה חשוב",body:"עמדו ישר, חיוך כנה",script:"שבעים אחוז מהתקשורת שלנו היא לא מילולית. אנשים מרגישים אם אתם בטוחים בעצמכם עוד לפני שהם שומעים מילה. בשיעור הזה נלמד טכניקות שגורמות לכם להיראות ולהרגיש כמו מרצים מקצועיים.",ai:"An illustration of a confident woman standing in front of a camera setup in a home studio. She has open body language: shoulders back, genuine smile, hands visible and relaxed at her sides. Warm golden key light illuminating her face. Behind her: a clean organized background with a bookshelf and plant. The overall mood radiates confidence and professionalism. Soft pink and mint color accents in the room decor. Aspirational but achievable home studio setting, 16:9.",icons:[{d:"כוח",p:"Superhero cape flowing, power pose, gold pink, transparent background."}]},
+{time:"1:30-3:00 – עיניים ומבט",body:"הסתכלו ישר למצלמה",script:"הסתכלו ישירות אל עדשת המצלמה – זה יוצר חיבור אישי. ההבדל העצום: לא לקרוא מהמסך! כשקוראים מהמסך העיניים נעות וזה נראה לא טבעי. השתמשו בטלפרומפטר כמו זה שאתם משתמשים בו עכשיו.",ai:"A split-screen comparison of eye contact in video. LEFT side labeled WRONG (subtle red tone): a persons face looking down at their desk reading from notes, eyes darting back and forth, nervous unfocused expression - feels disconnected. RIGHT side labeled RIGHT (warm golden tone): the same person looking directly into the camera lens with a warm engaging gaze, creating instant connection with the viewer. Golden circle highlighting the camera lens. Dramatic difference in connection feeling, 16:9.",icons:[{d:"עיניים",p:"Friendly eyes making contact, sparkle, transparent background."}]},
+{time:"3:00-4:30 – ידיים",body:"הדגימו כל תנועה",script:"ידיים גלויות – כפות פתוחות, לא צמודות. כשמדגישים – תנועת ידיים. כשמונים שלושה – שלוש אצבעות. אל תשלבו ידיים ואל תכניסו לכיסים.",ai:"A visual guide showing three rows of hand gestures for on-camera speaking. TOP row (green check, DO): open palms facing outward showing trust and openness, hands at chest level during emphasis, natural relaxed hand position. BOTTOM row (red X, DONT): crossed arms over chest, hands stuffed in pockets, fidgeting with pen or ring. Each gesture shown with a clear photograph or illustration. Clean instructional layout with pink and mint color coding, 16:9.",icons:[{d:"ידיים",p:"Open palms, trust icon, gold sparkle, transparent background."}]},
+{time:"4:30-5:30 – יציבה",body:"עמדו ישר",script:"כתפיים פתוחות – ביטחון מיידי. שבו על קצה הכיסא. הישענו קלות למצלמה כשחשוב. לעולם לא רפויים.",ai:"A dramatic before and after posture comparison showing two identical setups side by side. LEFT (gray, BEFORE): person slouching in chair, shoulders hunched forward, leaning back away from camera, chin down - looks disinterested and insecure. RIGHT (golden, AFTER): same person sitting on edge of chair, shoulders open, slight forward lean toward camera, chin level - looks confident, engaged, and professional. Golden transformation arrow between them. Clear improvement visualization, 16:9.",icons:[{d:"יציבה",p:"Person standing tall, confidence lines, transparent background."}]},
+{time:"5:30-6:30 – קול",body:"הדגימו שינויי טון",script:"שנו טון – לעולם לא מונוטוני. דברו כמו סיפור מרגש. האטו במילים חשובות. האטו בסוף משפטים קריטיים.",ai:"An audio visualization comparison. TOP half labeled MONOTONE (boring): a flat, almost straight-line audio waveform in dull gray, with a sleeping emoji and bored viewer faces. BOTTOM half labeled DYNAMIC (engaging): a varied, expressive audio waveform with peaks and valleys in vibrant gold and pink colors, with alert happy emoji and engaged viewer faces. Musical note icons around the dynamic version. Clear visual metaphor for voice variety importance, 16:9.",icons:[{d:"קול",p:"Colorful sound waves, engaging voice, transparent background."}]},
+{time:"6:30-7:30 – הבעות פנים",body:"הדגימו",script:"חיוך כנה. הנהנו בראש. הרימו גבה בשאלה. אנשים מזהים חיוך מזויף מיד.",ai:"A facial expression coaching chart showing four key expressions for on-camera communication. Arranged in a 2x2 grid with clean photos or illustrations: (1) GENUINE SMILE with sparkle - warm and authentic, eyes crinkle, (2) HEAD NOD - subtle agreement motion showing engagement, (3) RAISED EYEBROW - curious questioning look that adds intrigue, (4) ENGAGED LISTENING FACE - focused attentive expression. Each with a green checkmark and Hebrew label. Clean coaching guide layout, 16:9.",icons:[{d:"חיוך",p:"Warm smile icon with sparkle, transparent background."}]},
+{time:"7:30-8:00 – חימום",body:"הדגימו",script:"לפני הקלטה: דברו בקול רם שתי דקות. שתו מים. חייכו למצלמה שלושים שניות. הקליטו וצפו חזרה – הדרך הכי מהירה להשתפר.",ai:"A visual step-by-step pre-recording warmup routine shown as a horizontal timeline. Step 1 (2 min): person talking out loud to wall with speech bubbles, label VOCAL WARMUP. Step 2: glass of water icon, label HYDRATE. Step 3 (30 sec): person smiling at camera, label SMILE AT LENS. Step 4: person watching playback on phone, label WATCH AND IMPROVE. Each step connected by golden arrows. Friendly pastel illustration style, easy to follow morning routine aesthetic, 16:9.",tip:"שלושים שניות ביום מול מצלמה + צפייה חזרה = שיפור דרמטי בשבועיים.",icons:[{d:"שעון",p:"Stopwatch with 30 seconds, gold mint, transparent background."}]}
+]}
+]},
+{m:"מודול 9: ביטחון בדיבור מול מצלמה",icon:"💪",lessons:[
+{t:"שיעור 9.1: מתחילים לדבר בביטחון",d:"8 דקות",segs:[
+{time:"0:00-1:30 – הפחד הכי נפוץ",body:"דברו באמפתיה, חיוך חם",script:"אם הרעיון של לעמוד מול מצלמה מפחיד אתכם – אתם בחברה טובה. שמונים אחוז מהאנשים מרגישים חוסר ביטחון בפעם הראשונה. זה לגמרי נורמלי. והחדשות הטובות? ביטחון מול מצלמה זה שריר – ככל שמתאמנים, הוא מתחזק.",ai:"A transformation journey illustration in three panels. PANEL 1 (left, muted): a person standing nervously in front of a camera, shoulders tense, avoiding the lens, butterfly icons in stomach area, gray tones. PANEL 2 (middle, warming up): same person practicing, starting to relax, some color returning, half-smile. PANEL 3 (right, vibrant): the same person standing confidently, natural smile, open posture, golden glow, vibrant pastel pink and mint colors. Progress arrow underneath. Encouraging transformation story, 16:9.",icons:[{d:"פרפרים בבטן",p:"Butterflies flying around then settling down, nervousness to calm animation, pastel, transparent background."},{d:"שריר",p:"Arm muscle flexing, confidence strength icon, gold, transparent background."}]},
+{time:"1:30-3:00 – הטריקים של המקצוענים",body:"דברו בביטחון שקט",script:"הסוד הכי גדול: אף אחד לא מצליח בפעם הראשונה. כל יוצר תוכן מצליח שאתם מכירים היה גרוע בהתחלה. ההבדל? הם המשיכו. הטריק השני: אל תנסו להיות מושלמים. מושלם זה משעמם. אותנטי זה מרתק. אנשים רוצים לראות אדם אמיתי, לא רובוט.",ai:"A dramatic before and after comparison showing content creator growth. LEFT side labeled FIRST VIDEO: low quality webcam footage, bad lighting, awkward expression, messy background, low view count. RIGHT side labeled VIDEO 100: professional lighting, confident expression, branded background, polished editing, high view count and engagement. A golden growth arrow between them showing the massive improvement journey. The message: everyone starts somewhere. Encouraging comparison, 16:9.",icons:[{d:"לפני/אחרי",p:"Split screen: shaky nervous frame vs. confident pro frame, growth transformation, transparent background."},{d:"לב אותנטי",p:"Heart with 'real' written inside, authenticity icon, pink with gold border, transparent background."}]},
+{time:"3:00-4:30 – תרגיל החדר הריק",body:"הדגימו מול המצלמה",script:"התרגיל הכי יעיל שיש: כל יום, עמדו מול המצלמה של הטלפון ודברו דקה אחת על כל נושא שעולה לכם לראש. מזג אוויר, מה אכלתם, מה חלמתם. לא חשוב מה. חשוב שתדברו. אחרי שבוע – צפו בהקלטות. אחרי שבועיים – תרגישו שינוי עצום.",ai:"A motivational practice routine illustration. Center: a person standing comfortably in front of their phone on a tripod, talking naturally. Around them: a 7-day calendar with each day checked off in gold, a small progression chart showing confidence level rising from day 1 to day 7. Speech bubble with random topics: weather, food, dreams. Timer showing 1:00 (one minute). The mood is casual and encouraging - this is easy daily practice. Pastel pink room, warm lighting, accessible setting, 16:9.",icons:[{d:"טלפון + דיבור",p:"Phone camera recording person talking, daily practice icon, calendar marks, transparent background."},{d:"גרף שיפור",p:"Improvement graph climbing up over 14 days, progress chart, mint green to gold, transparent background."}]},
+{time:"4:30-5:30 – שיטת השלושה",body:"דברו בביטחון",script:"שלוש הקלטות לכל שיעור. הקלטה ראשונה – חימום, תשליכו אותה. הקלטה שנייה – הקלטה אמיתית. הקלטה שלישית – אם הרגשתם שמשהו לא עבד. תמיד תבחרו את הטובה ביותר. אף אחד לא יודע שהקלטתם שלוש פעמים.",ai:"Three film frame icons arranged horizontally, numbered TAKE 1, TAKE 2, TAKE 3 in elegant gold. TAKE 1 is slightly transparent with a warmup label and recycle icon. TAKE 2 glows with a golden border, starred, and labeled THE ONE with a checkmark - this is the chosen take. TAKE 3 is slightly transparent labeled backup. Below: a secret badge saying Nobody knows you recorded three times. Encouraging message about the three-take method. Film production aesthetic with pastel colors, 16:9.",icons:[{d:"3 הקלטות",p:"Three film frames numbered 1 2 3, middle one glowing gold as selected, take selection, transparent background."}]},
+{time:"5:30-6:30 – מה לעשות כשנתקעים",body:"דברו ברוגע",script:"כולם נתקעים. זה קורה. הפתרון: עצרו. נשמו. חזרו על המשפט האחרון. בעריכה תחתכו את הרגע הזה ואף אחד לא ידע. אין סיבה להתחיל מהתחלה בגלל טעות אחת. פשוט חתכו והמשיכו.",ai:"An illustration showing the video editing rescue process. A film strip running horizontally with frames. One frame in the middle is highlighted in red showing a BLOOPER moment (stumbling over words). Golden scissors are cutting out just that one frame. Below: the resulting clean film strip with the blooper removed, looking seamless and professional. The message: just cut and continue, no need to restart. Encouraging editing-as-safety-net concept. Film production style with pastel accents, 16:9.",icons:[{d:"מספריים",p:"Scissors cutting out a small piece of film, edit fix icon, gold scissors, transparent background."},{d:"נשימה",p:"Person breathing in calmly, zen breath circle, peaceful mint icon, transparent background."}]},
+{time:"6:30-8:00 – אנרגיה ואותנטיות",body:"דברו באנרגיה גבוהה",script:"הטיפ האחרון והכי חשוב: העלו את האנרגיה עשרים אחוז מעל מה שמרגיש טבעי. המצלמה סופגת אנרגיה – מה שנראה נורמלי בחיים נראה שטוח במסך. אם מרגישים שאתם קצת מוגזמים – ככה זה נראה טוב במצלמה. ובעיקר – היו את עצמכם. הקהל שלכם יאהב אתכם בדיוק כפי שאתם.",ai:"A creative visualization of the camera energy rule. LEFT side: a person speaking at normal energy with an energy meter showing 100%. CENTER: a camera lens with absorption waves pulling energy inward, showing how camera absorbs 20% of your energy. RIGHT side: a TV screen showing how the person appears - the meter shows only 80%, looking flat. SOLUTION arrow pointing up: boost to 120% energy in real life to appear at 100% on screen. Clever energy transfer infographic with gold meter, pink and mint accents, 16:9.",tip:"תרגיל יומי: דקה אחת מול מצלמה על נושא אקראי. אחרי 14 יום תראו שינוי מדהים.",icons:[{d:"אנרגיה",p:"Energy lightning bolt with +20% badge, power boost icon, gold electric, transparent background."},{d:"מראה",p:"Mirror reflecting confident person, self-acceptance icon, pink frame gold reflection, transparent background."}]}
+]}
+]},
+{m:"מודול 10: למה הקורס שלכם שווה קנייה",icon:"💎",lessons:[
+{t:"שיעור 10.1: הערך האמיתי של הקורס שלכם",d:"8 דקות",segs:[
+{time:"0:00-1:30 – הבעיה: תסמונת המתחזה",body:"דברו באמפתיה עמוקה",script:"כמעט כל יוצר קורס חדש שואל את עצמו: למה שמישהו ישלם לי? מה אני כבר יודע? מי אני בכלל שאלמד? זו תסמונת המתחזה – והיא שקרנית. האמת? אם עזרתם אפילו לאדם אחד עם הידע שלכם – הידע הזה שווה כסף. ואם אתם כאן ולומדים איך לבנות קורס – אתם כבר רציניים יותר מתשעים אחוז מהאנשים.",ai:"A powerful illustration of overcoming imposter syndrome. A person standing in front of a large mirror. Their reflection shows TWO versions: the fading gray ghost reflection shows doubt, question marks, and the words Who am I to teach? in faded text. But emerging through it, a vibrant golden reflection shows the real them: confident, knowledgeable, with value icons floating around (lightbulb, star, trophy, heart). The real reflection is breaking through the doubt. Emotional transformation moment, 16:9.",icons:[{d:"מראה",p:"Mirror showing scared face transforming to confident face, imposter syndrome breaking, transparent background."},{d:"כתר",p:"Golden crown appearing on head, self-worth discovery, sparkle, transparent background."}]},
+{time:"1:30-3:00 – חמישה סוגי ערך שאתם נותנים",body:"דברו בביטחון, ידיים גלויות",script:"ערך ראשון: חיסכון בזמן – אנשים משלמים כדי לא לבזבז חודשים בניסוי וטעייה. ערך שני: ארגון – אתם מסדרים להם את המידע בצורה ברורה. ערך שלישי: ניסיון – אתם כבר עשיתם את הטעויות ויכולים לחסוך להם. ערך רביעי: מוטיבציה – אתם מלווים ומעודדים. ערך חמישי: קהילה – אתם יוצרים מקום שייכות.",ai:"Five beautifully designed value proposition cards arranged in a fan layout. Each card has a large icon and Hebrew label: (1) PINK CARD - Golden clock icon: TIME SAVING - save months of trial and error, (2) MINT CARD - Folder icon: ORGANIZATION - structured clear learning path, (3) GOLD CARD - Star icon: EXPERIENCE - learn from real mistakes, (4) PINK CARD - Heart icon: MOTIVATION - ongoing support and encouragement, (5) MINT CARD - People icon: COMMUNITY - belong to a group of learners. Premium card design with subtle shadows, 16:9.",icons:[{d:"5 ערכים",p:"Five icons appearing in sequence: clock, folder, gold star, pink heart, people group, value proposition, transparent background."},{d:"שעון חיסכון",p:"Clock with fast-forward arrow, time saving icon, gold, transparent background."}]},
+{time:"3:00-4:30 – תמחור – כמה הקורס שווה",body:"דברו בביטחון על מחיר",script:"אל תתמחרו לפי כמה שעות הקלטתם. תמחרו לפי הערך שהתלמיד מקבל. שאלו את עצמכם: כמה שווה לאדם לפתור את הבעיה הזו? אם הקורס חוסך לו חודשים של לימוד עצמי – זה שווה מאות שקלים. אם הקורס עוזר לו להרוויח כסף – זה שווה אלפים.",ai:"An elegant mathematical formula displayed on a premium dark background with golden typography. The equation: VALUE OF PROBLEM SOLVED multiplied by TIME SAVED equals YOUR REAL PRICE. Below the formula: two examples - If your course saves someone 6 months of learning = worth hundreds, If your course helps someone earn money = worth thousands. Golden chalk on blackboard aesthetic, with small illustrations for each variable. Professional pricing strategy visual, 16:9.",icons:[{d:"נוסחת מחיר",p:"Equation with problem + time = price tag, golden math formula, transparent background."},{d:"תג מחיר",p:"Price tag with gold sparkle, premium value icon, transparent background."}]},
+{time:"4:30-6:00 – איך מציגים את הערך בדף המכירה",body:"הצביעו על דוגמה במסך",script:"אל תכתבו מה יש בקורס – כתבו מה הקורס יעשה עבורם. לא קורס של שש שעות על צילום – אלא תצלמו תמונות מקצועיות בטלפון תוך שבוע. לא שלושים שיעורים – אלא תתחילו להרוויח מהידע שלכם תוך חודש. תמיד מתוצאה, לא מתכונות.",ai:"A dramatic copywriting transformation comparison. LEFT side labeled FEATURES (red X, boring): a dull gray box with bullet points listing 6 hours of video, 30 lessons, PDF worksheets - dry and uninspiring. RIGHT side labeled OUTCOMES (gold check, compelling): a vibrant golden box with transformed copy: You will take professional photos with your phone within one week, You will start earning from your knowledge within a month. Same content, completely different emotional impact. Marketing copywriting masterclass visual, 16:9.",icons:[{d:"תכונות לתוצאות",p:"Feature list transforming into outcome statement, metamorphosis, dull to exciting, transparent background."},{d:"וי ירוק",p:"Green checkmark with 'results' text, outcome focus icon, transparent background."}]},
+{time:"6:00-7:30 – הוכחות חברתיות",body:"דברו בהתלהבות",script:"עדויות הן הנשק הכי חזק שיש. אפילו אם זה הקורס הראשון שלכם – הציעו גישה חינמית לחמישה אנשים בתמורה לביקורת כנה. המלצה אמיתית שווה יותר מכל קופי שיווקי. ועוד טיפ: צלמו את העדויות בוידאו – וידאו אמין פי עשרה מטקסט.",ai:"A social proof wall display showing customer testimonials. Multiple video thumbnail frames arranged in a mosaic pattern, each showing a happy person giving a video testimonial with play button overlay. Between the videos: golden 5-star rating badges, quote snippets in elegant pink cards, and verified purchase badges in mint green. A large overall rating of 4.9 stars in gold at the top. Professional testimonial showcase, trust-building aesthetic, 16:9.",icons:[{d:"כוכבים",p:"Five gold stars filling in one by one, rating animation, transparent background."},{d:"וידאו עדות",p:"Video player with happy person speaking, testimonial icon, warm frame, transparent background."}]},
+{time:"7:30-8:00 – תזכורת אחרונה",body:"דברו מהלב, כנות מוחלטת",script:"הקורס שלכם שווה קנייה כי אתם שמים בו את הניסיון, הידע, והלב שלכם. אף אחד בעולם לא יכול ללמד את מה שאתם מלמדים – בדרך שאתם מלמדים. זה הערך הייחודי שלכם ואף אחד לא יכול להעתיק אותו.",ai:"A powerful closing illustration showing a large golden heart shape in the center, radiating warm golden light rays outward. Inside the heart: a combination of a brain (knowledge), a star (value), and hands (giving). The light rays illuminate floating words around it: Experience, Passion, Your Unique Voice, Authenticity. Surrounding the scene: subtle confetti in pink and mint. The message: your course is worth buying because YOU made it. Emotional, inspiring, celebration of unique value, 16:9.",tip:"משימה: כתבו חמישה משפטים שמתחילים ב'הקורס שלי שווה קנייה כי...' ושמרו אותם לימים של ספק.",icons:[{d:"לב זהב",p:"Golden heart radiating light rays, self-worth affirmation, transparent background."},{d:"כתר יהלום",p:"Diamond crown with sparkles, premium value icon, transparent background."}]}
+]}
+]}
+,
+{m:"מודול 11: איך יודעים מתי הקורס מושלם?",icon:"✅",lessons:[
+{t:"שיעור 11.1: איך לדעת שהקורס מוכן להשקה",d:"8 דקות",segs:[
+{time:"0:00-1:30 – המלכודת של מושלם",body:"דברו באמפתיה וחיוך",script:"אחד האתגרים הכי גדולים של יוצרי קורסים – הרגשה שהקורס אף פעם לא מושלם. תמיד יש עוד משהו להוסיף. עוד שיעור. עוד בונוס. וזה המלכודת: מושלם הוא לא חסר פגמים – מושלם הוא כשהקורס עושה את מה שהוא הבטיח לעשות. הקורס צריך להביא את התלמיד מנקודה A לנקודה B. לא יותר. לא פחות.",ai:"A beautifully illustrated balance scale metaphor. LEFT side (tilting down, red tone): an overloaded course represented by a tower of stacked books, videos, and documents piling dangerously high, about to topple. RIGHT side (perfectly balanced, golden glow): a focused course represented by a clean, organized small stack of essential materials with a golden checkmark on top, perfectly balanced. The message: less focused content beats more unfocused content. Clean minimalist illustration, 16:9.",icons:[{d:"מאזניים",p:"Balance scale tipping from overloaded to balanced, gold, transparent background."},{d:"מטרה",p:"Bullseye with single arrow, focus, transparent background."}]},
+{time:"1:30-3:00 – חמישה סימנים שהקורס מוכן",body:"דברו בביטחון, ידיים גלויות",script:"סימן ראשון: כל שיעור מכסה נושא אחד בלבד. סימן שני: התלמיד מקבל תשובה ברורה לשאלה שהובטח לו. סימן שלישי: יש משימה מעשית בסוף כל מודול. סימן רביעי: אתם מרגישים בטוחים שכל מה שהבטחתם ללמד נמצא בקורס. סימן חמישי: אתם יכולים להסביר את הקורס במשפט אחד לחבר והוא מבין למה כדאי.",ai:"A premium course readiness checklist displayed on beautiful cream paper with gold details. Five items with large golden checkmarks: (1) Each lesson covers ONE topic only, (2) Student gets clear answer to promised question, (3) Practical assignment at end of each module, (4) All promised content is included, (5) You can explain the course in one sentence to a friend. Title in elegant gold: IS YOUR COURSE READY? Each check has a satisfying completed feeling. Professional quality assessment checklist, 16:9.",icons:[{d:"5 סימנים",p:"Five checkmarks appearing one by one, gold on pink paper, transparent background."}]},
+{time:"3:00-4:30 – פחות הוא יותר ממושלם",body:"דברו בביטחון",script:"אני רוצה שתשמעו את המשפט הזה טוב: פחות זה יותר ממושלם. הקורס הראשון שלכם לא חייב להיות יצירת המופת הסופית. הוא צריך להיות טוב. יעיל. ומושק. זכרו: קורס שלא מושק לא מביא תוצאות. קורס מושק ואמיתי משנה חיים. אז מה לעשות עם כל התכנים הנוספים שיש לכם?",ai:"A creative illustration of a large light switch on a wall. The switch is being flipped from OFF position (left, dark and gray) labeled OVERTHINKING and PERFECTIONISM with thought bubbles showing endless edits and additions, to ON position (right, bright golden glow) labeled LAUNCHING and MAKING IMPACT with celebration sparks and a rocket launching. The wall transitions from gray to warm golden illumination. Powerful visual metaphor for the decision to launch. Motivational, 16:9.",icons:[{d:"רקטה",p:"Rocket launching from perfectionism cage, freedom, transparent background."}]},
+{time:"4:30-6:00 – הפתרון: קורס מתקדם",body:"דברו בהתרגשות",script:"והנה החדשות הטובות: כל התכנים שלא נכנסו לקורס הראשון? הם הזהב של הקורס המתקדם. במקום להעמיס הכל בקורס אחד – צרו קורס בסיס וקורס מתקדם. הקורס המתקדם עושה שלושה דברים: נותן לכם מוצר נוסף למכירה, מעמיק את התלמידים המתקדמים, ומראה שאתם מומחים ומתפתחים.",ai:"An architectural building blocks illustration showing a two-level course strategy. BOTTOM LEVEL (solid, pink and gold): a strong foundation of building blocks labeled FOUNDATION COURSE with essential module cards. TOP LEVEL (reaching higher, mint and gold): additional blocks labeled ADVANCED COURSE. Golden bridge connects them. The message: build two courses instead of cramming into one. Professional infographic, 16:9.",icons:[{d:"מגדל",p:"Tower building from solid base, two-level course, gold pink, transparent background."},{d:"סולם",p:"Ladder with person climbing, growth, transparent background."}]},
+{time:"6:00-7:30 – איך להחליט מה נכנס לאן",body:"דברו ברוגע",script:"כלל אצבע: תכנים שנותנים תשובה ישירה לשאלה – נכנסים לקורס הבסיס. תכנים שדורשים ידע עמוק יותר – מתאימים לקורס מתקדם. תכנים שלא קשורים ישירות לנושא המרכזי – נשמרים לבונוס או לקורס עתידי. והנה הטסט האולטימטיבי: הראו את הקורס לשלושה אנשים מקהל היעד. אם הם הבינו – הקורס מוכן.",ai:"An illustration of three diverse people sitting with laptops watching a course. Above each: feedback cards showing thumbs up, helpful suggestions, and 5-star ratings. The course creator stands to the side taking notes with a satisfied smile. Warm collaborative atmosphere, pink and mint workspace, golden highlights. The ultimate beta test validation moment, 16:9.",icons:[{d:"טסט",p:"Three thumbs up, beta test icon, transparent background."}]},
+{time:"7:30-8:00 – סיום הקורס",body:"חיוך רחב, אנרגיה של חגיגה",script:"סיימנו את הקורס! עכשיו יש לכם את כל הידע, הכלים, והביטחון ליצור קורס דיגיטלי מצליח שימכר שוב ושוב. לכו ותעשו את זה! הקורס הראשון לא חייב מושלם – חייב מושק. בהצלחה ענקית!",ai:"A grand celebration scene marking course completion. Center: a golden trophy and graduation cap floating with dramatic sparkle effects. Surrounding them: an explosion of confetti in pink, mint, and gold. A laptop showing COURSE COMPLETE on screen with a 100% progress bar. Floating achievement badges: all modules done, first course created, ready to launch. Banner text: GO CREATE AND LAUNCH! Joyful, empowering celebration mood with warm golden lighting, 16:9.",tip:"הצעד הראשון: פתחו את הבונוסים והתחילו ליצור. הקורס הראשון לא חייב מושלם – חייב מושק!",icons:[{d:"קונפטי",p:"Confetti explosion with trophy, transparent background."},{d:"לב",p:"Pink heart expanding with gold sparkles, transparent background."}]}
+]}
+]}
+];
+</script>
+<script>
+/* ============================================================
+   TELEPROMPTER ENGINE - COMPLETELY REWRITTEN
+   ============================================================
+   
+   BUG FIXES:
+   1. Reset now STOPS auto-play first, then clears all marks,
+      scrolls to top, and re-marks the first sentence.
+   2. Sentence tracking uses a dedicated index counter instead
+      of relying solely on getBoundingClientRect, preventing
+      sentence skipping during fast scroll.
+   3. Auto-scroll uses requestAnimationFrame for smooth,
+      consistent movement instead of setInterval.
+   4. Scroll listener is properly attached after every lesson load.
+   5. All state is cleanly reset between lesson loads.
+   ============================================================ */
+
+let curL = null;
+let playing = false;
+let freePlay = false; // Personal reading pace - scroll without highlighting
+let freeAnimId = null;
+let animFrameId = null;
+let spd = 1;
+let fntSz = 26;
+let resetLock = false; // Prevents autoMark during reset
+
+/* ---- Sidebar ---- */
+function buildSB() {
+  var c = document.getElementById('sbC');
+  var h = '';
+  D.forEach(function(m, mi) {
+    h += '<div class="mg"><button class="mb" onclick="togMod(this)"><span>' + m.icon + '</span>' + m.m + '<span class="arr">◀</span></button><div class="ll">';
+    m.lessons.forEach(function(l, li) {
+      h += '<button class="lb" data-m="' + mi + '" data-l="' + li + '" onclick="loadL(' + mi + ',' + li + ')">' + l.t + ' (' + l.d + ')</button>';
+    });
+    h += '</div></div>';
+  });
+  c.innerHTML = h;
+}
+
+function togMod(el) {
+  var l = el.nextElementSibling;
+  var wasOpen = l.classList.contains('show');
+  document.querySelectorAll('.ll').forEach(function(x) { x.classList.remove('show'); });
+  document.querySelectorAll('.mb').forEach(function(x) { x.classList.remove('act'); });
+  if (!wasOpen) {
+    l.classList.add('show');
+    el.classList.add('act');
+  }
+}
+
+function togSB() {
+  var s = document.getElementById('sb');
+  if (window.innerWidth <= 768) {
+    s.classList.toggle('mob');
+  } else {
+    s.classList.toggle('collapsed');
+  }
+}
+
+/* ---- Sentence Splitting ---- */
+function splitSentences(txt) {
+  var results = [];
+  var buf = '';
+  for (var i = 0; i < txt.length; i++) {
+    buf += txt[i];
+    if ((txt[i] === '.' || txt[i] === '!' || txt[i] === '?') &&
+        (i === txt.length - 1 || txt[i + 1] === ' ' || txt[i + 1] === '\n')) {
+      if (buf.trim()) results.push(buf.trim());
+      buf = '';
+    }
+  }
+  if (buf.trim()) results.push(buf.trim());
+  return results;
+}
+
+/* ---- Load Lesson ---- */
+function loadL(mi, li) {
+  // Stop everything first
+  stopPlay();
+  resetLock = true;
+
+  curL = D[mi].lessons[li];
+
+  // Update sidebar
+  document.querySelectorAll('.lb').forEach(function(b) { b.classList.remove('act'); });
+  var btn = document.querySelector('[data-m="' + mi + '"][data-l="' + li + '"]');
+  if (btn) btn.classList.add('act');
+
+  // Update title
+  document.getElementById('ttl').textContent = curL.t;
+
+  // Render content
+  renderScript(curL);
+  renderPr(curL);
+  renderIc(curL);
+
+  // Switch to script tab
+  swTab(0);
+
+  // Close mobile sidebar
+  if (window.innerWidth <= 768) {
+    document.getElementById('sb').classList.remove('mob');
+  }
+
+  // Scroll to top and setup highlighting after render
+  var pnl = document.getElementById('pnl0');
+  pnl.scrollTop = 0;
+
+  setTimeout(function() {
+    resetLock = false;
+    autoMark();
+    attachScrollListener();
+  }, 100);
+}
+
+/* ---- Render Script ---- */
+function renderScript(l) {
+  var a = document.getElementById('tp');
+  var h = '';
+  l.segs.forEach(function(s, i) {
+    h += '<div class="seg" id="seg' + i + '">';
+    h += '<div class="ts-line">⏰ ' + s.time + '</div>';
+    h += '<div class="bc">🎭 ' + s.body + '</div>';
+    if (s.iconcue) h += '<div class="ic-cue">✨ ' + s.iconcue + '</div>';
+    var sents = splitSentences(s.script);
+    h += '<div class="script-text">';
+    sents.forEach(function(sent, si) {
+      h += '<span class="sent" data-idx="' + si + '" onclick="clickSent(this)">' + sent + ' </span>';
+    });
+    h += '</div>';
+    if (s.tip) h += '<div class="tip-bx">⭐ ' + s.tip + '</div>';
+    h += '</div>';
+  });
+  a.innerHTML = h;
+  a.style.fontSize = fntSz + 'px';
+}
+
+function renderPr(l) {
+  var a = document.getElementById('pnl1');
+  var h = '';
+  l.segs.forEach(function(s) {
+    h += '<div class="ai-cd"><div class="lbl">🎨 ' + s.time + '</div><div class="pr" onclick="copyEl(this)">' + s.ai + '</div><div class="ch">לחצי להעתקה</div></div>';
+  });
+  a.innerHTML = h;
+}
+
+function renderIc(l) {
+  var a = document.getElementById('pnl2');
+  var h = '';
+  l.segs.forEach(function(s) {
+    if (s.icons && s.icons.length) {
+      h += '<div style="margin-bottom:6px;color:var(--gd-d);font-weight:700;font-size:.88rem;">' + s.time + '</div>';
+      s.icons.forEach(function(ic) {
+        h += '<div class="ic-cd"><div class="il">✨ ' + ic.d + '</div><div class="ic-pr" onclick="copyEl(this)">' + ic.p + '</div><div class="ch" style="color:var(--pk-d)">לחצי להעתקה</div></div>';
+      });
+    }
+  });
+  if (!h) h = '<div class="welc"><div class="emo">✨</div><div class="wd">אין אייקונים לשיעור זה</div></div>';
+  a.innerHTML = h;
+}
+
+/* ---- Manual Click on Sentence ---- */
+function clickSent(el) {
+  el.classList.toggle('manual-read');
+}
+
+/* ============================================================
+   CORE FIX: autoMark - Sentence Highlighting Engine
+   ============================================================
+   Uses the read-line position (35% from top of panel) to
+   determine which sentence is "current" and which are "read".
+   
+   Key fix: We iterate ALL sentences every time and compare
+   their position to the read line. No early breaks that could
+   skip sentences.
+   ============================================================ */
+function autoMark() {
+  if (resetLock) return;
+  if (freePlay) return; // Don't highlight in personal reading mode
+
+  var pnl = document.getElementById('pnl0');
+  if (!pnl) return;
+
+  var sents = pnl.querySelectorAll('.sent');
+  if (!sents.length) return;
+
+  var pnlRect = pnl.getBoundingClientRect();
+  var readY = pnlRect.top + pnlRect.height * 0.35;
+
+  var currentIdx = -1;
+
+  // Find the LAST sentence whose CENTER is at or above the read line.
+  // Using center (not top) prevents skipping the first visible sentence.
+  for (var i = 0; i < sents.length; i++) {
+    var r = sents[i].getBoundingClientRect();
+    var sentCenter = r.top + r.height * 0.5;
+
+    if (sentCenter <= readY) {
+      currentIdx = i;
+    }
+  }
+
+  // Apply states
+  for (var j = 0; j < sents.length; j++) {
+    var s = sents[j];
+    if (s.classList.contains('manual-read')) continue;
+
+    s.classList.remove('read', 'current');
+
+    if (j < currentIdx) {
+      s.classList.add('read');
+    } else if (j === currentIdx) {
+      s.classList.add('current');
+    }
+  }
+
+  // If nothing reached the line yet, mark the first sentence as current
+  if (currentIdx < 0 && sents.length > 0) {
+    for (var k = 0; k < sents.length; k++) {
+      if (!sents[k].classList.contains('manual-read')) {
+        sents[k].classList.add('current');
+        break;
+      }
+    }
+  }
+
+  updProg();
+}
+
+/* ---- Scroll Listener ---- */
+var scrollListenerAttached = false;
+
+function attachScrollListener() {
+  var pnl = document.getElementById('pnl0');
+  if (!pnl) return;
+
+  // Remove old listener if any
+  if (pnl._scrollHandler) {
+    pnl.removeEventListener('scroll', pnl._scrollHandler);
+  }
+
+  // Create new handler with throttle
+  var ticking = false;
+  pnl._scrollHandler = function() {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(function() {
+        autoMark();
+        ticking = false;
+      });
+    }
+  };
+
+  pnl.addEventListener('scroll', pnl._scrollHandler, { passive: true });
+  scrollListenerAttached = true;
+}
+
+/* ============================================================
+   CORE FIX: Reset - Now properly stops everything
+   ============================================================ */
+function handleReset() {
+  // 1. Stop auto-play first
+  stopPlay();
+
+  // 1b. Stop free play too
+  if (freePlay) stopFreePlay();
+
+  // 2. Lock autoMark to prevent re-marking during scroll-to-top
+  resetLock = true;
+
+  // 3. Clear ALL sentence marks
+  var sents = document.querySelectorAll('.sent');
+  for (var i = 0; i < sents.length; i++) {
+    sents[i].className = 'sent';
+  }
+
+  // 4. Scroll to top
+  var pnl = document.getElementById('pnl0');
+  if (pnl) {
+    pnl.scrollTop = 0;
+  }
+
+  // 5. Reset progress bar immediately
+  document.getElementById('progF').style.width = '0%';
+
+  // 6. After scroll settles, unlock and mark first sentence
+  setTimeout(function() {
+    resetLock = false;
+    var firstSent = document.querySelector('#pnl0 .sent');
+    if (firstSent) {
+      firstSent.classList.add('current');
+    }
+  }, 250);
+}
+
+/* ============================================================
+   CORE FIX: Auto-Play - Uses requestAnimationFrame
+   ============================================================
+   Instead of setInterval (which can drift and cause skips),
+   we use requestAnimationFrame for smooth, consistent scrolling.
+   ============================================================ */
+function togPlay() {
+  if (playing) {
+    stopPlay();
+  } else {
+    startPlay();
+  }
+}
+
+function startPlay() {
+  if (playing) return;
+  // Stop free play if running
+  if (freePlay) stopFreePlay();
+  playing = true;
+  document.getElementById('pb').textContent = '⏸ עצירה';
+  document.getElementById('pb').classList.add('on');
+
+  var lastTime = performance.now();
+  var accumulated = 0; // Accumulate sub-pixel fractions
+
+  function scrollStep() {
+    if (!playing) return;
+
+    var now = performance.now();
+    var delta = now - lastTime;
+    lastTime = now;
+
+    // Cap delta to prevent huge jumps (e.g. after tab switch)
+    if (delta > 100) delta = 16;
+
+    var pnl = document.getElementById('pnl0');
+    if (pnl) {
+      // Accumulate fractional pixels
+      accumulated += spd * 0.8 * (delta / 16.67);
+
+      // Only scroll when we have at least 1 whole pixel
+      if (accumulated >= 1) {
+        var pixels = Math.floor(accumulated);
+        accumulated -= pixels;
+        pnl.scrollTop += pixels;
+        autoMark();
+      }
+    }
+
+    animFrameId = requestAnimationFrame(scrollStep);
+  }
+
+  animFrameId = requestAnimationFrame(scrollStep);
+}
+
+function stopPlay() {
+  playing = false;
+  if (animFrameId) {
+    cancelAnimationFrame(animFrameId);
+    animFrameId = null;
+  }
+  document.getElementById('pb').textContent = '▶ הפעלה';
+  document.getElementById('pb').classList.remove('on');
+}
+
+/* ============================================================
+   FREE PLAY - Personal Reading Pace (no highlighting)
+   ============================================================
+   Scrolls the text automatically at the chosen speed but does
+   NOT highlight or color any sentences. The reader follows
+   along at their own comfort without visual markers.
+   ============================================================ */
+function togFreePlay() {
+  if (freePlay) {
+    stopFreePlay();
+  } else {
+    startFreePlay();
+  }
+}
+
+function startFreePlay() {
+  // Stop regular play if running
+  if (playing) stopPlay();
+  freePlay = true;
+  document.getElementById('fpb').textContent = '⏸ עצור קצב';
+  document.getElementById('fpb').classList.add('on');
+
+  // Clear all sentence highlighting
+  var sents = document.querySelectorAll('.sent');
+  for (var i = 0; i < sents.length; i++) {
+    sents[i].classList.remove('read', 'current', 'manual-read');
+  }
+
+  var lastTime = performance.now();
+  var accumulated = 0;
+
+  function freeStep() {
+    if (!freePlay) return;
+
+    var now = performance.now();
+    var delta = now - lastTime;
+    lastTime = now;
+    if (delta > 100) delta = 16;
+
+    var pnl = document.getElementById('pnl0');
+    if (pnl) {
+      accumulated += spd * 0.8 * (delta / 16.67);
+      if (accumulated >= 1) {
+        var pixels = Math.floor(accumulated);
+        accumulated -= pixels;
+        pnl.scrollTop += pixels;
+        // Update progress bar only, NO sentence marking
+        updProg();
+      }
+    }
+    freeAnimId = requestAnimationFrame(freeStep);
+  }
+
+  freeAnimId = requestAnimationFrame(freeStep);
+}
+
+function stopFreePlay() {
+  freePlay = false;
+  if (freeAnimId) {
+    cancelAnimationFrame(freeAnimId);
+    freeAnimId = null;
+  }
+  document.getElementById('fpb').textContent = '📖 קצב אישי';
+  document.getElementById('fpb').classList.remove('on');
+}
+
+/* ---- Speed & Font ---- */
+function updSpd() {
+  spd = +document.getElementById('spd').value;
+  document.getElementById('spdV').textContent = spd % 1 === 0 ? spd : spd.toFixed(1);
+}
+
+function chFnt(d) {
+  fntSz = Math.max(16, Math.min(52, fntSz + d));
+  document.getElementById('fntV').textContent = fntSz;
+  document.getElementById('tp').style.fontSize = fntSz + 'px';
+  // Re-mark after font size change (positions change)
+  setTimeout(autoMark, 50);
+}
+
+/* ---- Progress & Scroll ---- */
+function updProg() {
+  var p = document.getElementById('pnl0');
+  if (!p) return;
+  var max = p.scrollHeight - p.clientHeight;
+  var pct = max > 0 ? (p.scrollTop / max) * 100 : 0;
+  document.getElementById('progF').style.width = Math.min(pct, 100) + '%';
+
+  // Show/hide scroll-to-top button
+  var scBtn = document.getElementById('scTop');
+  if (p.scrollTop > 300) {
+    scBtn.classList.add('show');
+  } else {
+    scBtn.classList.remove('show');
+  }
+}
+
+function scToTop() {
+  handleReset();
+}
+
+/* ---- Tabs ---- */
+function swTab(n) {
+  stopPlay();
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('on'); });
+  document.querySelectorAll('.pnl').forEach(function(p) { p.classList.remove('on'); });
+  document.querySelectorAll('.tab')[n].classList.add('on');
+  document.getElementById('pnl' + n).classList.add('on');
+}
+
+/* ---- Copy ---- */
+function copyEl(el) {
+  navigator.clipboard.writeText(el.textContent).then(function() {
+    el.classList.add('copied');
+    var h = el.nextElementSibling;
+    if (h) h.textContent = '✓ הועתק!';
+    setTimeout(function() {
+      el.classList.remove('copied');
+      if (h) h.textContent = 'לחצי להעתקה';
+    }, 2000);
+  });
+}
+
+/* ---- Camera ---- */
+var camStream = null, mediaRec = null, recChunks = [], recTimerInt = null, recSec = 0, camOpen = false;
+
+function togCam() {
+  if (camOpen) stopCam();
+  else startCam();
+}
+
+function startCam() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    alert('המצלמה לא זמינה בסביבה הזו. יש לפתוח את הקובץ ישירות בדפדפן.');
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({
+    video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+    audio: true
+  }).then(function(stream) {
+    camStream = stream;
+    document.getElementById('camVid').srcObject = stream;
+    document.getElementById('camWrap').classList.add('open');
+    document.getElementById('camBtn').classList.add('on');
+    document.getElementById('camBtn').textContent = '📹 מצלמה ●';
+    camOpen = true;
+  }).catch(function(e) {
+    alert('לא ניתן לגשת למצלמה: ' + e.message);
+  });
+}
+
+function stopCam() {
+  if (mediaRec && mediaRec.state === 'recording') stopRec();
+  if (camStream) {
+    camStream.getTracks().forEach(function(t) { t.stop(); });
+    camStream = null;
+  }
+  document.getElementById('camVid').srcObject = null;
+  document.getElementById('camWrap').classList.remove('open');
+  document.getElementById('camBtn').classList.remove('on');
+  document.getElementById('camBtn').textContent = '📹 מצלמה';
+  camOpen = false;
+}
+
+function togRec() {
+  if (mediaRec && mediaRec.state === 'recording') stopRec();
+  else startRec();
+}
+
+function startRec() {
+  if (!camStream) return;
+  recChunks = [];
+  var opts = { mimeType: 'video/webm;codecs=vp9,opus' };
+  if (!MediaRecorder.isTypeSupported(opts.mimeType)) opts.mimeType = 'video/webm';
+  if (!MediaRecorder.isTypeSupported(opts.mimeType)) opts.mimeType = '';
+  mediaRec = new MediaRecorder(camStream, opts);
+  mediaRec.ondataavailable = function(e) { if (e.data.size > 0) recChunks.push(e.data); };
+  mediaRec.onstop = function() {
+    var blob = new Blob(recChunks, { type: mediaRec.mimeType || 'video/webm' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    var now = new Date();
+    var ts = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0') + '_' + String(now.getHours()).padStart(2, '0') + '-' + String(now.getMinutes()).padStart(2, '0');
+    a.download = 'recording_' + ts + '.webm';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+  mediaRec.start(1000);
+  recSec = 0;
+  document.getElementById('recBtn').textContent = '⏹ עצור הקלטה';
+  document.getElementById('recBtn').classList.add('recording');
+  document.getElementById('camBtn').classList.add('rec');
+  document.getElementById('camTimer').classList.add('on');
+  updRecTimer();
+  recTimerInt = setInterval(function() { recSec++; updRecTimer(); }, 1000);
+}
+
+function stopRec() {
+  if (mediaRec && mediaRec.state === 'recording') mediaRec.stop();
+  clearInterval(recTimerInt);
+  recTimerInt = null;
+  document.getElementById('recBtn').textContent = '⏺ הקלטה';
+  document.getElementById('recBtn').classList.remove('recording');
+  document.getElementById('camBtn').classList.remove('rec');
+  document.getElementById('camTimer').classList.remove('on');
+}
+
+function updRecTimer() {
+  var m = String(Math.floor(recSec / 60)).padStart(2, '0');
+  var s = String(recSec % 60).padStart(2, '0');
+  document.getElementById('camTimer').textContent = '● ' + m + ':' + s;
+}
+
+/* ---- Keyboard Shortcuts ---- */
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+  if (e.code === 'Space') { e.preventDefault(); togPlay(); }
+  if (e.code === 'ArrowUp') { e.preventDefault(); chFnt(2); }
+  if (e.code === 'ArrowDown') { e.preventDefault(); chFnt(-2); }
+  if (e.code === 'ArrowRight') {
+    spd = Math.min(10, Math.round((spd + 0.5) * 10) / 10);
+    document.getElementById('spd').value = spd;
+    updSpd();
+  }
+  if (e.code === 'ArrowLeft') {
+    spd = Math.max(0.1, Math.round((spd - 0.5) * 10) / 10);
+    document.getElementById('spd').value = spd;
+    updSpd();
+  }
+});
+
+/* ---- Initialize ---- */
+buildSB();
+
+// Load first lesson when ready
+function initFirstLesson() {
+  if (D && D[0] && D[0].lessons && D[0].lessons[0]) {
+    loadL(0, 0);
+    return true;
+  }
+  return false;
+}
+
+// Try loading with increasing delays to handle all environments
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  setTimeout(initFirstLesson, 50);
+} else {
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(initFirstLesson, 50);
+  });
+}
+
+window.addEventListener('load', function() {
+  setTimeout(function() {
+    if (!curL) initFirstLesson();
+  }, 200);
+});
+</script>
+</body>
+</html>
